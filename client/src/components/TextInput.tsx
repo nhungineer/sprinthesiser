@@ -75,37 +75,56 @@ Focus Group Notes:
         title: "Checkout & Payment Issues",
         description: "Users struggle with complex checkout process and want saved payment methods for convenience",
         color: "#fecaca",
-        quotes: ["Found the checkout process confusing and too many steps", "Wants to save payment methods for faster checkout"],
+        quotes: [
+          { text: "Found the checkout process confusing and too many steps", source: "User A", transcriptId: 1 },
+          { text: "Wants to save payment methods for faster checkout", source: "User A", transcriptId: 1 }
+        ],
       },
       {
         title: "Search & Navigation Problems", 
         description: "Difficulty finding search features and navigating between product categories",
         color: "#fed7c3",
-        quotes: ["Difficulty finding the search feature on mobile", "Difficulty navigating between product categories"],
+        quotes: [
+          { text: "Difficulty finding the search feature on mobile", source: "User A", transcriptId: 1 },
+          { text: "Difficulty navigating between product categories", source: "User C", transcriptId: 1 }
+        ],
       },
       {
         title: "Product Information Needs",
         description: "Users want more comprehensive product details including photos, reviews, and better filtering",
         color: "#fef3c7",
-        quotes: ["Would like more product photos and reviews", "Suggested better filtering options for search results"],
+        quotes: [
+          { text: "Would like more product photos and reviews", source: "User A", transcriptId: 1 },
+          { text: "Suggested better filtering options for search results", source: "User B", transcriptId: 1 }
+        ],
       },
       {
         title: "Feature Requests",
         description: "High demand for wishlist, notifications, and dark mode functionality",
         color: "#d1fae5",
-        quotes: ["Wants wishlist functionality to save items for later", "Wants push notifications for price drops", "Dark mode was a frequently requested feature"],
+        quotes: [
+          { text: "Wants wishlist functionality to save items for later", source: "User B", transcriptId: 1 },
+          { text: "Wants push notifications for price drops", source: "User C", transcriptId: 1 },
+          { text: "Dark mode was a frequently requested feature", source: "Focus Group", transcriptId: 1 }
+        ],
       },
       {
         title: "App Performance & Design",
         description: "Concerns about app stability, outdated design, and need for modern interface",
         color: "#dbeafe",
-        quotes: ["Mentioned app crashes occasionally on older phones", "Found the app design outdated compared to competitors"],
+        quotes: [
+          { text: "Mentioned app crashes occasionally on older phones", source: "User A", transcriptId: 1 },
+          { text: "Found the app design outdated compared to competitors", source: "User C", transcriptId: 1 }
+        ],
       },
       {
         title: "Customer Support & Experience",
         description: "Users want better support options and more personalized shopping experience", 
         color: "#e0e7ff",
-        quotes: ["All users mentioned wanting better customer support chat", "Users want more personalized shopping experience"],
+        quotes: [
+          { text: "All users mentioned wanting better customer support chat", source: "Focus Group", transcriptId: 1 },
+          { text: "Users want more personalized shopping experience", source: "Focus Group", transcriptId: 1 }
+        ],
       }
     ];
 
