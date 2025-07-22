@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Brain, Settings, Download, FileText, Upload, MoreHorizontal, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,13 @@ import AnalysisControls from "@/components/AnalysisControls";
 import ThemeGrid from "@/components/ThemeGrid";
 import ExportSection from "@/components/ExportSection";
 import { Theme, Transcript, Project } from "@shared/schema";
+import { exportToExcel, exportToPDF, sortThemes } from "@/lib/export";
 
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState<'input' | 'themes'>('input');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [sortedThemes, setSortedThemes] = useState<Theme[]>([]);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -23,6 +25,13 @@ export default function Home() {
   const { data: themes = [], refetch: refetchThemes } = useQuery<Theme[]>({
     queryKey: ["/api/themes"],
   });
+
+  // Update sortedThemes when themes change
+  useEffect(() => {
+    if (themes.length > 0 && JSON.stringify(themes) !== JSON.stringify(sortedThemes)) {
+      setSortedThemes(themes);
+    }
+  }, [themes, sortedThemes]);
 
   const { data: transcripts = [], refetch: refetchTranscripts } = useQuery<Transcript[]>({
     queryKey: ["/api/transcripts"],
@@ -41,6 +50,20 @@ export default function Home() {
   const handleUploadComplete = () => {
     refetchTranscripts();
     setIsUploadModalOpen(false);
+  };
+
+  const handleSort = (type: 'az' | 'color') => {
+    const sorted = sortThemes(themes, type);
+    setSortedThemes(sorted);
+  };
+
+  const handleExport = (format: 'excel' | 'pdf') => {
+    const themesToExport = sortedThemes.length > 0 ? sortedThemes : themes;
+    if (format === 'excel') {
+      exportToExcel(themesToExport);
+    } else {
+      exportToPDF(themesToExport);
+    }
   };
 
   return (
@@ -63,10 +86,22 @@ export default function Home() {
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport('excel')}>
+                    Export to Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                    Export to PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -120,14 +155,33 @@ export default function Home() {
         )}
 
         {currentStep === 'themes' && themes.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">Extracted Themes</h2>
-                <p className="text-slate-600 mt-1">{themes.length} themes identified from your research data</p>
-              </div>
+              <p className="text-slate-600">{themes.length} themes identified from your research data</p>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center space-x-2">
+                    <MoreHorizontal className="w-4 h-4" />
+                    <span>More</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={() => {/* TODO: Implement collapse all */}}>
+                    Collapse All
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {/* TODO: Implement auto arrange */}}>
+                    Auto Arrange
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort('az')}>
+                    Sort A-Z
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort('color')}>
+                    Sort by Type & Color
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <ThemeGrid themes={themes} onThemeUpdate={refetchThemes} />
+            <ThemeGrid themes={sortedThemes.length > 0 ? sortedThemes : themes} onThemeUpdate={refetchThemes} />
             <ExportSection disabled={themes.length === 0} />
           </div>
         )}

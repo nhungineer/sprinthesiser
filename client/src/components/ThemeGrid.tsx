@@ -39,31 +39,13 @@ export default function ThemeGrid({ themes, onThemeUpdate }: ThemeGridProps) {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-slate-600 hover:text-slate-900"
-          >
-            {isCollapsed ? (
-              <ArrowLeftFromLine className="w-4 h-4 mr-2" />
-            ) : (
-              <Import className="w-4 h-4 mr-2" />
-            )}
-            {isCollapsed ? "Expand All" : "Collapse All"}
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-slate-600 hover:text-slate-900"
-          >
-            <ArrowLeftFromLine className="w-4 h-4 mr-2" />
-            Auto-arrange
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+           onDragOver={(e) => e.preventDefault()}
+           onDrop={(e) => {
+             e.preventDefault();
+             // Handle drag and drop positioning
+           }}
+      >
         {themes.map((theme) => (
           <ThemeCard
             key={theme.id}

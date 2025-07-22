@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Edit, Trash2, EllipsisVertical } from "lucide-react";
+import { Edit, Trash2, EllipsisVertical, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Theme, Quote } from "@shared/schema";
@@ -8,21 +8,21 @@ interface ThemeCardProps {
   theme: Theme;
   onEdit: (theme: Theme) => void;
   onDelete: (id: number) => void;
+  isDragging?: boolean;
 }
 
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string; border: string }> = {
-  "#ef4444": { bg: "bg-red-200", text: "text-red-900", accent: "bg-red-100", border: "border-red-300" },
-  "#8b5cf6": { bg: "bg-violet-200", text: "text-violet-900", accent: "bg-violet-100", border: "border-violet-300" },
-  "#06b6d4": { bg: "bg-cyan-200", text: "text-cyan-900", accent: "bg-cyan-100", border: "border-cyan-300" },
-  "#84cc16": { bg: "bg-lime-200", text: "text-lime-900", accent: "bg-lime-100", border: "border-lime-300" },
-  "#f97316": { bg: "bg-orange-200", text: "text-orange-900", accent: "bg-orange-100", border: "border-orange-300" },
-  "#ec4899": { bg: "bg-pink-200", text: "text-pink-900", accent: "bg-pink-100", border: "border-pink-300" },
-  "#eab308": { bg: "bg-yellow-200", text: "text-yellow-900", accent: "bg-yellow-100", border: "border-yellow-300" },
+  "#ef4444": { bg: "bg-red-200", text: "text-red-900", accent: "bg-red-100", border: "border-red-300" }, // Pain points
+  "#10b981": { bg: "bg-green-200", text: "text-green-900", accent: "bg-green-100", border: "border-green-300" }, // What works
+  "#eab308": { bg: "bg-yellow-200", text: "text-yellow-900", accent: "bg-yellow-100", border: "border-yellow-300" }, // Feature requests
+  "#3b82f6": { bg: "bg-blue-200", text: "text-blue-900", accent: "bg-blue-100", border: "border-blue-300" }, // Emotions/behavior
+  "#6b7280": { bg: "bg-gray-200", text: "text-gray-900", accent: "bg-gray-100", border: "border-gray-300" }, // Miscellaneous
 };
 
-export default function ThemeCard({ theme, onEdit, onDelete }: ThemeCardProps) {
+export default function ThemeCard({ theme, onEdit, onDelete, isDragging = false }: ThemeCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const colors = THEME_COLORS[theme.color] || THEME_COLORS["#ef4444"];
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const colors = THEME_COLORS[theme.color] || THEME_COLORS["#6b7280"];
 
   const quotes = theme.quotes as Quote[];
   const displayQuotes = quotes.slice(0, 2); // Show first 2 quotes
@@ -38,13 +38,73 @@ export default function ThemeCard({ theme, onEdit, onDelete }: ThemeCardProps) {
     return `${Math.floor(diffMins / 1440)}d ago`;
   };
 
+  if (isCollapsed) {
+    return (
+      <Card
+        className={`${colors.bg} ${colors.border} theme-card draggable-theme border-2 p-4 relative cursor-move ${
+          isHovered ? 'rotate-1' : ''
+        } ${isDragging ? 'opacity-50 rotate-3 scale-105' : ''}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{ 
+          minHeight: '80px',
+          boxShadow: isHovered 
+            ? '0 10px 20px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.05)' 
+            : '0 2px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03)',
+          transform: isHovered ? 'scale(1.02) rotate(1deg)' : 'scale(1) rotate(0deg)',
+          transition: 'all 0.2s ease-in-out'
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <h3 className={`font-semibold ${colors.text} text-base leading-tight`}>
+              {theme.title}
+            </h3>
+            <div className={`${colors.text} text-sm font-medium opacity-80 flex items-center space-x-1`}>
+              <MessageSquare className="w-3 h-3" />
+              <span>{quotes.length}</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCollapsed(false);
+              }}
+              className={`${colors.text} hover:opacity-80 p-1`}
+            >
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(theme);
+              }}
+              className={`${colors.text} hover:opacity-80 p-1`}
+            >
+              <EllipsisVertical className="w-3 h-3" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card
-      className={`${colors.bg} ${colors.border} theme-card draggable-theme border-2 p-5 relative ${
+      className={`${colors.bg} ${colors.border} theme-card draggable-theme border-2 p-5 relative cursor-move ${
         isHovered ? 'rotate-2' : ''
-      }`}
+      } ${isDragging ? 'opacity-50 rotate-3 scale-105' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData('text/plain', theme.id.toString());
+      }}
       style={{ 
         minHeight: '280px',
         boxShadow: isHovered 
@@ -59,21 +119,34 @@ export default function ThemeCard({ theme, onEdit, onDelete }: ThemeCardProps) {
           <h3 className={`font-semibold ${colors.text} text-lg leading-tight`}>
             {theme.title}
           </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(theme);
-            }}
-            className={`${colors.text} hover:opacity-80 p-1`}
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCollapsed(true);
+              }}
+              className={`${colors.text} hover:opacity-80 p-1`}
+            >
+              <ChevronUp className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(theme);
+              }}
+              className={`${colors.text} hover:opacity-80 p-1`}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
-        <div className={`${colors.text} text-sm font-medium opacity-80`}>
-          <span className="mr-1">💬</span>
-          {quotes.length} supporting quote{quotes.length !== 1 ? 's' : ''}
+        <div className={`${colors.text} text-sm font-medium opacity-80 flex items-center space-x-1`}>
+          <MessageSquare className="w-3 h-3" />
+          <span>{quotes.length} supporting quote{quotes.length !== 1 ? 's' : ''}</span>
         </div>
       </div>
 

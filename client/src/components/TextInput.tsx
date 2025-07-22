@@ -74,7 +74,7 @@ Focus Group Notes:
       {
         title: "Checkout & Payment Issues",
         description: "Users struggle with complex checkout process and want saved payment methods for convenience",
-        color: "#fecaca",
+        color: "#ef4444", // Red for pain points
         quotes: [
           { text: "Found the checkout process confusing and too many steps", source: "User A", transcriptId: 1 },
           { text: "Wants to save payment methods for faster checkout", source: "User A", transcriptId: 1 }
@@ -83,25 +83,25 @@ Focus Group Notes:
       {
         title: "Search & Navigation Problems", 
         description: "Difficulty finding search features and navigating between product categories",
-        color: "#fed7c3",
+        color: "#ef4444", // Red for pain points
         quotes: [
           { text: "Difficulty finding the search feature on mobile", source: "User A", transcriptId: 1 },
           { text: "Difficulty navigating between product categories", source: "User C", transcriptId: 1 }
         ],
       },
       {
-        title: "Product Information Needs",
-        description: "Users want more comprehensive product details including photos, reviews, and better filtering",
-        color: "#fef3c7",
+        title: "What Works Well",
+        description: "Users appreciate fast delivery and easy returns process",
+        color: "#10b981", // Green for what works
         quotes: [
-          { text: "Would like more product photos and reviews", source: "User A", transcriptId: 1 },
-          { text: "Suggested better filtering options for search results", source: "User B", transcriptId: 1 }
+          { text: "Love how fast the delivery is, usually get items next day", source: "User B", transcriptId: 1 },
+          { text: "Returns process is very straightforward and hassle-free", source: "User A", transcriptId: 1 }
         ],
       },
       {
         title: "Feature Requests",
         description: "High demand for wishlist, notifications, and dark mode functionality",
-        color: "#d1fae5",
+        color: "#eab308", // Yellow for feature requests
         quotes: [
           { text: "Wants wishlist functionality to save items for later", source: "User B", transcriptId: 1 },
           { text: "Wants push notifications for price drops", source: "User C", transcriptId: 1 },
@@ -109,21 +109,21 @@ Focus Group Notes:
         ],
       },
       {
-        title: "App Performance & Design",
-        description: "Concerns about app stability, outdated design, and need for modern interface",
-        color: "#dbeafe",
+        title: "User Emotions & Behavior",
+        description: "Users feel frustrated with complex processes but excited about product variety",
+        color: "#3b82f6", // Blue for emotions/behavior
         quotes: [
-          { text: "Mentioned app crashes occasionally on older phones", source: "User A", transcriptId: 1 },
-          { text: "Found the app design outdated compared to competitors", source: "User C", transcriptId: 1 }
+          { text: "Gets frustrated when checkout takes too long", source: "User A", transcriptId: 1 },
+          { text: "Really excited about the variety of products available", source: "User C", transcriptId: 1 }
         ],
       },
       {
-        title: "Customer Support & Experience",
-        description: "Users want better support options and more personalized shopping experience", 
-        color: "#e0e7ff",
+        title: "General Feedback",
+        description: "Miscellaneous suggestions and observations from user research", 
+        color: "#6b7280", // White/gray for miscellaneous
         quotes: [
-          { text: "All users mentioned wanting better customer support chat", source: "Focus Group", transcriptId: 1 },
-          { text: "Users want more personalized shopping experience", source: "Focus Group", transcriptId: 1 }
+          { text: "Would recommend the app to friends despite some issues", source: "User B", transcriptId: 1 },
+          { text: "Overall satisfied but sees room for improvement", source: "Focus Group", transcriptId: 1 }
         ],
       }
     ];
