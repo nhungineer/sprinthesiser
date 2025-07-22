@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Upload, Wand2, Settings, MoreHorizontal } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
-import AnalysisControls from "@/components/AnalysisControls";
 
 interface TextInputProps {
   onAnalysisComplete: () => void;
@@ -21,6 +20,7 @@ export default function TextInput({ onAnalysisComplete, isAnalyzing, setIsAnalyz
   const [text, setText] = useState("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Sample data for demonstration
   const sampleData = `Interview with User A (E-commerce App):
@@ -122,6 +122,10 @@ Focus Group Notes:
       title: "Sample Analysis Complete",
       description: "Sample themes created for demonstration (OpenAI API key needed for real analysis)",
     });
+    
+    // Refetch themes to show the new sample data
+    queryClient.invalidateQueries({ queryKey: ["/api/themes"] });
+    setIsAnalyzing(false);
     onAnalysisComplete();
   };
 

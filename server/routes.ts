@@ -202,6 +202,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create theme
+  app.post("/api/themes", async (req, res) => {
+    try {
+      const validation = updateThemeSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid theme data", errors: validation.error.errors });
+      }
+
+      const themeData = {
+        projectId: DEFAULT_PROJECT_ID,
+        ...validation.data,
+        position: validation.data.position || 0,
+      };
+
+      const newTheme = await storage.createTheme(themeData);
+      res.json({ message: "Theme created successfully", theme: newTheme });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create theme", error: error.message });
+    }
+  });
+
   // Update theme
   app.patch("/api/themes/:id", async (req, res) => {
     try {
