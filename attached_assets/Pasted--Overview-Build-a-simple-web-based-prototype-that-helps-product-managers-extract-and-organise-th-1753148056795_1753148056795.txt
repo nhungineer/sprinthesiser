@@ -1,0 +1,56 @@
+**Overview:** Build a simple web-based prototype that helps product managers extract and organise themes from user interview transcripts using AI analysis.
+
+**Core Features:**
+
+1. Paste research text or Upload files
+    - Main tab: A window allows user to paste research text
+    - Drag-and-drop interface supporting .txt, .doc, .docx, .md, .pdf files
+    - Make sure that the text is cleanly formatted for AI parsing
+    - Multiple file upload capability
+2. **AI Theme Extraction**
+    - Analyse transcripts using semantic clustering to identify recurring themes
+    - Extract 5-10 key themes per project (across all uploaded transcripts)
+    - Generate supporting quotes for each theme (2-3 quotes minimum)
+    - Highlight relevant portions of transcripts in bold
+3. **Visual Theme Presentation**
+    - Display themes as colorful post-it note style cards
+    - Each theme card shows: theme title, supporting quotes, source transcript references
+    - Use distinct colors for different themes
+    - Mimic Miro-style clustering layout
+4. **User Interaction & Refinement**
+    - Allow users to edit theme titles and descriptions
+    - Enable merging/splitting of themes
+    - Add/remove supporting quotes
+    - Implement feedback system to improve future extractions
+5. **Export Functionality**
+    - Export options: Excel, Google Sheets, PDF, Word Doc
+    - Include theme summary, supporting quotes, and source references
+6. **Settings & Preferences**
+    - User preference settings for theme extraction sensitivity
+    - Option to focus on specific types of themes (pain points, feature requests, behaviors)
+    - Save extraction preferences per user
+
+**Technical Requirements:**
+
+- Use semantic text analysis for theme clustering
+- Implement in-memory storage (no localStorage/sessionStorage)
+- Responsive design for desktop/tablet use
+- Handle text parsing for multiple file formats
+- Include error handling for file processing
+
+**User Workflow:**
+
+1. Paste research text, OR Drag and drop transcript files
+2. AI processes and extracts themes
+3. Review themes in post-it note interface
+4. Edit/refine themes as needed
+5. User can also collapse the themes, and reorder the themes as needed 
+6. Export results in preferred format
+
+**UI/UX Specifications:**
+
+- Clean, modern interface with PM-friendly design
+- Color-coded theme cards with hover effects
+- Intuitive drag-and-drop zone
+- Progress indicators during processing
+- Friendly error message
