@@ -90,6 +90,17 @@ Preferred communication style: Simple, everyday language.
 - `DATABASE_URL`: PostgreSQL connection string for Drizzle
 - `OPENAI_API_KEY`: Required for AI theme extraction functionality
 
+## Recent Changes
+
+### Latest Updates (January 2025)
+- **Streamlined UI Workflow**: Simplified timeline navigation to left-aligned layout for better UX
+- **Enhanced Text Input**: Made text pasting the primary input method with word/character counts and prominent analyze button
+- **File Upload Integration**: Moved file upload to secondary button in text input header for cleaner interface
+- **Sample Data System**: Added comprehensive sample themes with realistic user research data for demonstration
+- **Post-it Note Styling**: Enhanced theme cards with pastel colors, drop shadows, and authentic post-it note appearance
+- **Immediate Analysis**: Removed multi-step workflow - users can now analyze themes directly after pasting text
+- **API Endpoint Fixes**: Added missing POST /api/themes endpoint and fixed theme creation data structure
+
 ### Key Architectural Decisions
 
 1. **In-Memory Storage**: Chosen for prototype speed and simplicity, with easy migration path to persistent storage
