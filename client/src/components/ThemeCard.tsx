@@ -9,6 +9,8 @@ interface ThemeCardProps {
   onEdit: (theme: Theme) => void;
   onDelete: (id: number) => void;
   isDragging?: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 const THEME_COLORS: Record<string, { bg: string; text: string; accent: string; border: string }> = {
@@ -19,9 +21,8 @@ const THEME_COLORS: Record<string, { bg: string; text: string; accent: string; b
   "#6b7280": { bg: "bg-gray-200", text: "text-gray-900", accent: "bg-gray-100", border: "border-gray-300" }, // Miscellaneous
 };
 
-export default function ThemeCard({ theme, onEdit, onDelete, isDragging = false }: ThemeCardProps) {
+export default function ThemeCard({ theme, onEdit, onDelete, isDragging = false, isCollapsed = false, onToggleCollapse }: ThemeCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const colors = THEME_COLORS[theme.color] || THEME_COLORS["#6b7280"];
 
   const quotes = theme.quotes as Quote[];
@@ -71,7 +72,7 @@ export default function ThemeCard({ theme, onEdit, onDelete, isDragging = false 
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                setIsCollapsed(false);
+                onToggleCollapse?.();
               }}
               className={`${colors.text} hover:opacity-80 p-1`}
             >
@@ -101,10 +102,6 @@ export default function ThemeCard({ theme, onEdit, onDelete, isDragging = false 
       } ${isDragging ? 'opacity-50 rotate-3 scale-105' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      draggable
-      onDragStart={(e) => {
-        e.dataTransfer.setData('text/plain', theme.id.toString());
-      }}
       style={{ 
         minHeight: '280px',
         boxShadow: isHovered 
@@ -125,7 +122,7 @@ export default function ThemeCard({ theme, onEdit, onDelete, isDragging = false 
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                setIsCollapsed(true);
+                onToggleCollapse?.();
               }}
               className={`${colors.text} hover:opacity-80 p-1`}
             >

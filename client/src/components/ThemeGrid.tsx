@@ -9,11 +9,13 @@ import { Theme } from "@shared/schema";
 interface ThemeGridProps {
   themes: Theme[];
   onThemeUpdate: () => void;
+  allCollapsed?: boolean;
+  onCollapseAll?: () => void;
 }
 
-export default function ThemeGrid({ themes, onThemeUpdate }: ThemeGridProps) {
+export default function ThemeGrid({ themes, onThemeUpdate, allCollapsed = false, onCollapseAll }: ThemeGridProps) {
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [individuallyCollapsed, setIndividuallyCollapsed] = useState<Set<number>>(new Set());
 
   const handleEdit = (theme: Theme) => {
     setEditingTheme(theme);
@@ -37,22 +39,47 @@ export default function ThemeGrid({ themes, onThemeUpdate }: ThemeGridProps) {
     onThemeUpdate();
   };
 
+  const toggleIndividualCollapse = (themeId: number) => {
+    const newCollapsed = new Set(individuallyCollapsed);
+    if (newCollapsed.has(themeId)) {
+      newCollapsed.delete(themeId);
+    } else {
+      newCollapsed.add(themeId);
+    }
+    setIndividuallyCollapsed(newCollapsed);
+  };
+
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-           onDragOver={(e) => e.preventDefault()}
-           onDrop={(e) => {
-             e.preventDefault();
-             // Handle drag and drop positioning
-           }}
-      >
-        {themes.map((theme) => (
-          <ThemeCard
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {themes.map((theme, index) => (
+          <div
             key={theme.id}
-            theme={theme}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', index.toString());
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+              if (dragIndex !== index) {
+                // Trigger reorder callback to parent
+                const event = new CustomEvent('themeReorder', {
+                  detail: { dragIndex, hoverIndex: index }
+                });
+                window.dispatchEvent(event);
+              }
+            }}
+          >
+            <ThemeCard
+              theme={theme}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              isCollapsed={allCollapsed || individuallyCollapsed.has(theme.id)}
+              onToggleCollapse={() => toggleIndividualCollapse(theme.id)}
+            />
+          </div>
         ))}
 
         {/* Add New Theme Button */}

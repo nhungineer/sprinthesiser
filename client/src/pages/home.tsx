@@ -17,6 +17,7 @@ export default function Home() {
   const [currentStep, setCurrentStep] = useState<'input' | 'themes'>('input');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [sortedThemes, setSortedThemes] = useState<Theme[]>([]);
+  const [allCollapsed, setAllCollapsed] = useState(false);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -28,10 +29,19 @@ export default function Home() {
 
   // Update sortedThemes when themes change
   useEffect(() => {
-    if (themes.length > 0 && JSON.stringify(themes) !== JSON.stringify(sortedThemes)) {
-      setSortedThemes(themes);
-    }
-  }, [themes, sortedThemes]);
+    setSortedThemes(themes);
+  }, [themes]);
+
+  // Listen for drag reorder events
+  useEffect(() => {
+    const handleReorder = (e: any) => {
+      const { dragIndex, hoverIndex } = e.detail;
+      handleDragReorder(dragIndex, hoverIndex);
+    };
+    
+    window.addEventListener('themeReorder', handleReorder);
+    return () => window.removeEventListener('themeReorder', handleReorder);
+  }, [sortedThemes, themes]);
 
   const { data: transcripts = [], refetch: refetchTranscripts } = useQuery<Transcript[]>({
     queryKey: ["/api/transcripts"],
@@ -64,6 +74,19 @@ export default function Home() {
     } else {
       exportToPDF(themesToExport);
     }
+  };
+
+  const handleCollapseAll = () => {
+    setAllCollapsed(!allCollapsed);
+  };
+
+  const handleDragReorder = (dragIndex: number, hoverIndex: number) => {
+    const currentThemes = sortedThemes.length > 0 ? sortedThemes : themes;
+    const draggedTheme = currentThemes[dragIndex];
+    const newThemes = [...currentThemes];
+    newThemes.splice(dragIndex, 1);
+    newThemes.splice(hoverIndex, 0, draggedTheme);
+    setSortedThemes(newThemes);
   };
 
   return (
@@ -166,8 +189,8 @@ export default function Home() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem onClick={() => {/* TODO: Implement collapse all */}}>
-                    Collapse All
+                  <DropdownMenuItem onClick={handleCollapseAll}>
+                    {allCollapsed ? 'Expand All' : 'Collapse All'}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => {/* TODO: Implement auto arrange */}}>
                     Auto Arrange
@@ -181,7 +204,12 @@ export default function Home() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <ThemeGrid themes={sortedThemes.length > 0 ? sortedThemes : themes} onThemeUpdate={refetchThemes} />
+            <ThemeGrid 
+              themes={sortedThemes.length > 0 ? sortedThemes : themes} 
+              onThemeUpdate={refetchThemes}
+              allCollapsed={allCollapsed}
+              onCollapseAll={handleCollapseAll}
+            />
             <ExportSection disabled={themes.length === 0} />
           </div>
         )}
