@@ -74,7 +74,7 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Process Timeline */}
-        <div className="flex items-center justify-center mb-8">
+        <div className="flex items-center justify-start mb-8">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setCurrentStep('input')}
@@ -109,63 +109,13 @@ export default function Home() {
         {currentStep === 'input' && (
           <div className="space-y-8">
             {/* Main Text Input */}
-            <TextInput onTextAdded={handleTextAdded} />
+            <TextInput 
+              onAnalysisComplete={handleAnalysisComplete}
+              isAnalyzing={isAnalyzing}
+              setIsAnalyzing={setIsAnalyzing}
+            />
 
-            {/* Secondary Upload Option */}
-            <div className="text-center">
-              <p className="text-sm text-slate-600 mb-3">Or upload research files</p>
-              <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="text-blue-600 border-blue-300 hover:bg-blue-50">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Files
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Upload Research Files</DialogTitle>
-                  </DialogHeader>
-                  <FileUpload onUploadComplete={handleUploadComplete} />
-                </DialogContent>
-              </Dialog>
-            </div>
 
-            {/* Analysis Section */}
-            {transcripts.length > 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Ready to Analyze</h3>
-                    <p className="text-sm text-slate-600">
-                      {transcripts.length} transcript{transcripts.length !== 1 ? 's' : ''} ready for AI analysis
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="text-slate-600">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          Advanced Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          Custom Prompts
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AnalysisControls 
-                      onAnalysisStart={() => setIsAnalyzing(true)}
-                      onAnalysisComplete={handleAnalysisComplete}
-                      disabled={transcripts.length === 0}
-                      compact={true}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
