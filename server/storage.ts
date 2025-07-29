@@ -60,8 +60,9 @@ export class MemStorage implements IStorage {
 
     // Create default project
     this.createProject({
-      name: "Research Analysis Project",
-      description: "AI-powered theme extraction from user interviews"
+      name: "Sprint Insights",
+      description: "AI-powered synthesis assistant for Google Design Sprints",
+      sprintGoal: ""
     });
   }
 
@@ -70,6 +71,9 @@ export class MemStorage implements IStorage {
     const project: Project = {
       ...insertProject,
       id,
+      description: insertProject.description ?? null,
+      sprintGoal: insertProject.sprintGoal ?? null,
+      sprintQuestions: insertProject.sprintQuestions ?? null,
       createdAt: new Date(),
     };
     this.projects.set(id, project);
@@ -89,6 +93,7 @@ export class MemStorage implements IStorage {
     const transcript: Transcript = {
       ...insertTranscript,
       id,
+      transcriptType: insertTranscript.transcriptType ?? null,
       uploadedAt: new Date(),
     };
     this.transcripts.set(id, transcript);
@@ -110,6 +115,9 @@ export class MemStorage implements IStorage {
     const theme: Theme = {
       ...insertTheme,
       id,
+      description: insertTheme.description ?? null,
+      hmwQuestions: insertTheme.hmwQuestions ?? null,
+      votes: insertTheme.votes ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -145,6 +153,11 @@ export class MemStorage implements IStorage {
     const settings: AnalysisSettings = {
       ...insertSettings,
       id,
+      painPoints: insertSettings.painPoints ?? true,
+      featureRequests: insertSettings.featureRequests ?? true,
+      userBehaviors: insertSettings.userBehaviors ?? false,
+      emotions: insertSettings.emotions ?? false,
+      themeCount: insertSettings.themeCount ?? "5-7",
     };
     this.analysisSettings.set(id, settings);
     return settings;

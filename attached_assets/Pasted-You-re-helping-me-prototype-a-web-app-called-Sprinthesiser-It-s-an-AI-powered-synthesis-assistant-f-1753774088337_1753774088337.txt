@@ -1,0 +1,52 @@
+You're helping me prototype a web app called Sprinthesiser. It's an AI-powered synthesis assistant for Google Design Sprints.
+Please use the following information to simulate output, help me iterate the product, or generate UI/UX components, quote groupings, or interface logic. Your goal is to cluster interview transcripts into structured insight formats, generate traceable summaries, and enable team collaboration for sprint facilitators.
+
+Take your time, ask clarifying questions and reference screenshots for rough mockup, draft user flow, storyboard and some example UI interactions I like 
+🧵 TL;DR
+Sprinthesiser helps time-poor sprint facilitators (PMs, designers, engineers) analySe raw transcripts from Day 2 expert interviews and Day 4 user tests. It outputs structured insights, HMWs, and recommendations with direct traceability back to source quotes. Editing, voting, and export functions support collaborative use.
+👤 User Stories
+* As a facilitator, I want to upload raw transcripts and get structured themes quickly.
+* As a team member, I want to verify insights via source quotes.
+* As a facilitator, I want to initiate a quick team voting session to decide which insights matter most.
+🧭 UX Flow Summary
+Step 1: Add Sprint Context
+* User pastes in a sprint goal and optionally, sprint questions
+* App previews synthesis format based on context
+Step 2: Upload Transcript(s)
+* Supports paste-in text, .txt, .md, .doc
+* AI automatically detects transcript type:
+   * Expert interview → Use insight model A
+   * User testing session → Use insight model B
+Step 3: Synthesise
+* AI clusters quotes into themes
+   * For expert interviews:
+      * Themes: Pain Points, Opportunities, Behaviors
+      * Output: HMW questions under each insight
+   * For user testing:
+      * Themes: What worked, What didn’t, Recommendations
+* Each theme includes a summary + grouped quotes
+Step 4: Review & Edit
+* User can accept, remove, or merge AI-generated themes
+* Hover over summaries to reveal supporting quote in full transcript
+* HMW questions shown (read-only for now)
+Step 5: Live Voting
+* 15-minute anonymous voting session
+* Top-voted insights float to top
+* Votes disappear after time window ends (privacy-first)
+Step 6: Export
+* Export insight board as:
+   * Text summary (Markdown or plain text)
+   * Screenshot (for pasting into Miro/Slides)
+⚠️ Error Handling & Fallbacks
+* Irrelevant or off-topic content:
+   * Filter low-signal text (e.g. greetings, chit-chat)
+   * Add "⚠️ Needs Review" tag if unclear
+* Low-confidence quotes or weak themes:
+   * Drop into “💬 Unsorted Quotes” section
+   * Show rationale for exclusion
+* Transcript type not detected:
+   * Prompt user to manually select type
+   * If uncertain, use neutral format with generic categories
+* Small or noisy themes:
+   * Collapse into “🧹 Possible Noise” section
+   * Let user promote/delete with one click

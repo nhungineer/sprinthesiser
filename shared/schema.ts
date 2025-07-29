@@ -12,6 +12,8 @@ export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
+  sprintGoal: text("sprint_goal"),
+  sprintQuestions: text("sprint_questions").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -21,6 +23,7 @@ export const transcripts = pgTable("transcripts", {
   filename: text("filename").notNull(),
   content: text("content").notNull(),
   fileType: text("file_type").notNull(),
+  transcriptType: text("transcript_type"), // 'expert_interview' | 'user_testing' | 'auto_detect'
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
 });
 
@@ -31,6 +34,9 @@ export const themes = pgTable("themes", {
   description: text("description"),
   color: text("color").notNull(),
   quotes: jsonb("quotes").$type<Quote[]>().notNull(),
+  hmwQuestions: text("hmw_questions").array(), // How Might We questions
+  category: text("category").notNull(), // 'opportunities', 'pain_points', 'ideas_hmws'
+  votes: integer("votes").default(0),
   position: integer("position").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

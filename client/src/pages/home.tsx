@@ -29,7 +29,9 @@ export default function Home() {
 
   // Update sortedThemes when themes change
   useEffect(() => {
-    setSortedThemes(themes);
+    if (themes.length > 0 && sortedThemes.length === 0) {
+      setSortedThemes(themes);
+    }
   }, [themes]);
 
   // Listen for drag reorder events
@@ -41,7 +43,7 @@ export default function Home() {
     
     window.addEventListener('themeReorder', handleReorder);
     return () => window.removeEventListener('themeReorder', handleReorder);
-  }, [sortedThemes, themes]);
+  }, []);
 
   const { data: transcripts = [], refetch: refetchTranscripts } = useQuery<Transcript[]>({
     queryKey: ["/api/transcripts"],

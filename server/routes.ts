@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { FileParserService } from "./services/fileParser";
 import { OpenAIService } from "./services/openai";
 import { ExportService } from "./services/export";
+import { SprintAIService } from "./services/sprintAI";
 import { 
   fileUploadSchema, 
   textInputSchema, 
@@ -38,7 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(project);
     } catch (error) {
-      res.status(500).json({ message: "Failed to get project", error: error.message });
+      res.status(500).json({ message: "Failed to get project", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -93,6 +94,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sprint synthesis - new Design Sprint specific route
+  app.post("/api/sprint/synthesize", async (req, res) => {
+    try {
+      const { content, sprintGoal } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ message: "Content is required" });
+      }
+
+      // Extract Sprint insights using specialized AI service
+      const sprintThemes = await SprintAIService.extractSprintInsights(content, sprintGoal);
+      
+      // Store themes in database
+      const storedThemes = [];
+      for (let i = 0; i < sprintThemes.length; i++) {
+        const theme = sprintThemes[i];
+        const storedTheme = await storage.createTheme({
+          projectId: DEFAULT_PROJECT_ID,
+          title: theme.title,
+          description: theme.description,
+          color: theme.color,
+          quotes: theme.quotes,
+          category: theme.category,
+          hmwQuestions: theme.hmwQuestions || [],
+          position: i,
+        });
+        storedThemes.push(storedTheme);
+      }
+
+      // Store the transcript content too
+      await storage.createTranscript({
+        projectId: DEFAULT_PROJECT_ID,
+        filename: "Pasted Content",
+        content: content,
+        fileType: "text",
+        transcriptType: "auto_detect"
+      });
+
+      res.json({ 
+        message: "Sprint synthesis completed successfully", 
+        themes: storedThemes 
+      });
+    } catch (error) {
+      console.error("Sprint synthesis error:", error);
+      res.status(500).json({ message: "Failed to synthesize sprint insights", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   // Add text content
   app.post("/api/text", async (req, res) => {
     try {
@@ -113,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "Text added successfully", transcript });
     } catch (error) {
-      res.status(500).json({ message: "Failed to add text", error: error.message });
+      res.status(500).json({ message: "Failed to add text", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -171,6 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: theme.description,
           color: theme.color,
           quotes: theme.quotes,
+          category: 'opportunities', // Default category for Design Sprint
           position: i,
         });
         storedThemes.push(storedTheme);
