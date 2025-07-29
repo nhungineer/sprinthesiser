@@ -12,17 +12,22 @@ interface EnhancedThemeCardProps {
   transcriptType: 'expert_interviews' | 'testing_notes';
   onEditStep?: (themeId: number, stepIndex: number, newValue: string) => void;
   onDeleteStep?: (themeId: number, stepIndex: number) => void;
+  onViewTranscript?: (quote: Quote) => void;
+  transcriptContent?: string;
 }
 
 export function EnhancedThemeCard({ 
   theme, 
   transcriptType, 
   onEditStep, 
-  onDeleteStep
+  onDeleteStep,
+  onViewTranscript,
+  transcriptContent = ""
 }: EnhancedThemeCardProps) {
   const [editingStep, setEditingStep] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isHovered, setIsHovered] = useState(false);
+  const [hoveredStepIndex, setHoveredStepIndex] = useState<number | null>(null);
 
   const getCategoryConfig = () => {
     if (transcriptType === 'expert_interviews') {
@@ -95,7 +100,11 @@ export function EnhancedThemeCard({
           </h5>
           <div className="space-y-2">
             {theme.quotes?.slice(0, 2).map((quote, idx) => (
-              <div key={idx} className="bg-gray-50 p-3 rounded text-sm">
+              <div 
+                key={idx} 
+                className="bg-gray-50 p-3 rounded text-sm cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => onViewTranscript?.(quote)}
+              >
                 <p className="text-gray-700 line-clamp-2">"{quote.text}"</p>
                 <p className="text-xs text-gray-500 mt-1">— {quote.source}</p>
               </div>
@@ -137,7 +146,12 @@ export function EnhancedThemeCard({
                 </h5>
                 <div className="space-y-2">
                   {theme.aiSuggestedSteps.map((step, idx) => (
-                    <div key={idx} className="bg-blue-50 p-3 rounded border border-blue-200">
+                    <div 
+                      key={idx} 
+                      className="bg-blue-50 p-3 rounded border border-blue-200 relative"
+                      onMouseEnter={() => setHoveredStepIndex(idx)}
+                      onMouseLeave={() => setHoveredStepIndex(null)}
+                    >
                       {editingStep === idx ? (
                         <div className="space-y-2">
                           <textarea
@@ -156,71 +170,73 @@ export function EnhancedThemeCard({
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm text-blue-800 flex-1">{step}</p>
-                          <div className="flex gap-1">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => handleCopyStep(step)}
-                                >
-                                  <Copy className="w-3 h-3" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Copy</TooltipContent>
-                            </Tooltip>
-                            
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => handleEditStep(idx)}
-                                >
-                                  <Edit className="w-3 h-3" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Edit</TooltipContent>
-                            </Tooltip>
-
-                            <AlertDialog>
+                        <div className="flex items-start gap-2">
+                          <p className="text-sm text-blue-800 flex-1 pr-2">{step}</p>
+                          {hoveredStepIndex === idx && (
+                            <div className="flex gap-1 shrink-0">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <AlertDialogTrigger asChild>
-                                    <Button 
-                                      size="sm" 
-                                      variant="ghost" 
-                                      className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>Delete</TooltipContent>
-                              </Tooltip>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete AI Suggestion</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete this AI-suggested next step? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction 
-                                    onClick={() => handleDeleteStep(idx)}
-                                    className="bg-red-600 hover:bg-red-700"
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => handleCopyStep(step)}
                                   >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
+                                    <Copy className="w-3 h-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Copy</TooltipContent>
+                              </Tooltip>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => handleEditStep(idx)}
+                                  >
+                                    <Edit className="w-3 h-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Edit</TooltipContent>
+                              </Tooltip>
+
+                              <AlertDialog>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <AlertDialogTrigger asChild>
+                                      <Button 
+                                        size="sm" 
+                                        variant="ghost" 
+                                        className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Delete</TooltipContent>
+                                </Tooltip>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete AI Suggestion</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete this AI-suggested next step? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => handleDeleteStep(idx)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

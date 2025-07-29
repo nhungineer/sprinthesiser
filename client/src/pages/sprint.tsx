@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Upload, Plus, Vote, Download, X } from "lucide-react";
-import { Project, Theme } from "@shared/schema";
+import { Project, Theme, Quote } from "@shared/schema";
+import { TranscriptModal } from "@/components/TranscriptModal";
 import { queryClient } from "@/lib/queryClient";
 import { EnhancedThemeCard } from "@/components/EnhancedThemeCard";
 import { SprintStatistics } from "@/components/SprintStatistics";
@@ -28,6 +29,8 @@ export default function SprintPage() {
     hasAISuggestions: null,
   });
   const [processingTime, setProcessingTime] = useState(0);
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [showTranscriptModal, setShowTranscriptModal] = useState(false);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -105,6 +108,11 @@ export default function SprintPage() {
 
 
 
+  const handleViewTranscript = (quote: Quote) => {
+    setSelectedQuote(quote);
+    setShowTranscriptModal(true);
+  };
+
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
   };
@@ -174,7 +182,7 @@ export default function SprintPage() {
         {/* Filters */}
         <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Opportunities */}
           <div className="space-y-4">
             <div className="bg-green-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
@@ -187,6 +195,8 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
+                  onViewTranscript={handleViewTranscript}
+                  transcriptContent={transcriptContent}
                 />
               ))}
               {opportunities.length === 0 && (
@@ -209,6 +219,8 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
+                  onViewTranscript={handleViewTranscript}
+                  transcriptContent={transcriptContent}
                 />
               ))}
               {painPoints.length === 0 && (
@@ -231,6 +243,8 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
+                  onViewTranscript={handleViewTranscript}
+                  transcriptContent={transcriptContent}
                 />
               ))}
               {ideasHmws.length === 0 && (
@@ -254,13 +268,24 @@ export default function SprintPage() {
                     key={theme.id}
                     theme={theme}
                     transcriptType={transcriptType}
+                    onViewTranscript={handleViewTranscript}
+                    transcriptContent={transcriptContent}
                   />
                 ))}
               </div>
             </div>
           )}
         </div>
-
+        
+        {/* Transcript Modal */}
+        {selectedQuote && (
+          <TranscriptModal
+            quote={selectedQuote}
+            transcriptContent={transcriptContent}
+            isOpen={showTranscriptModal}
+            onOpenChange={setShowTranscriptModal}
+          />
+        )}
       </div>
     );
   };

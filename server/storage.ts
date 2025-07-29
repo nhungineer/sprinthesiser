@@ -31,6 +31,7 @@ export interface IStorage {
   getThemesByProject(projectId: number): Promise<Theme[]>;
   updateTheme(id: number, updates: UpdateThemeType): Promise<Theme | undefined>;
   deleteTheme(id: number): Promise<void>;
+  clearThemes(): Promise<void>;
   
   // Analysis Settings
   createAnalysisSettings(settings: InsertAnalysisSettings): Promise<AnalysisSettings>;
@@ -117,7 +118,9 @@ export class MemStorage implements IStorage {
       id,
       description: insertTheme.description ?? null,
       hmwQuestions: insertTheme.hmwQuestions ?? null,
+      aiSuggestedSteps: insertTheme.aiSuggestedSteps ?? null,
       votes: insertTheme.votes ?? 0,
+      position: insertTheme.position ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -146,6 +149,10 @@ export class MemStorage implements IStorage {
 
   async deleteTheme(id: number): Promise<void> {
     this.themes.delete(id);
+  }
+
+  async clearThemes(): Promise<void> {
+    this.themes.clear();
   }
 
   async createAnalysisSettings(insertSettings: InsertAnalysisSettings): Promise<AnalysisSettings> {

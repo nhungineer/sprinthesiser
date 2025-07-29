@@ -27,6 +27,7 @@ export function SprintStatistics({ themes, processingTime = 0 }: SprintStatistic
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-blue-600" />
             <span className="text-lg font-bold text-blue-600">{themes.length}</span>
+            <span className="text-sm text-gray-600">themes</span>
           </div>
           
           <div className="flex items-center gap-2">
@@ -34,11 +35,13 @@ export function SprintStatistics({ themes, processingTime = 0 }: SprintStatistic
               <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
             <span className="text-lg font-bold text-green-600">{totalQuotes}</span>
+            <span className="text-sm text-gray-600">quotes</span>
           </div>
           
           <div className="flex items-center gap-2">
             <Lightbulb className="w-4 h-4 text-yellow-600" />
             <span className="text-lg font-bold text-yellow-600">{totalHMWs}</span>
+            <span className="text-sm text-gray-600">HMWs</span>
           </div>
           
           <div className="flex items-center gap-2">
@@ -46,6 +49,7 @@ export function SprintStatistics({ themes, processingTime = 0 }: SprintStatistic
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-lg font-bold text-purple-600">{totalAISuggestions}</span>
+            <span className="text-sm text-gray-600">AI steps</span>
           </div>
         </div>
         
