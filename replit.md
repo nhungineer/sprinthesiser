@@ -1,8 +1,8 @@
-# ThemeSync - AI-Powered User Research Analysis Tool
+# Sprinthesiser - AI-Powered Design Sprint Synthesis Assistant
 
 ## Overview
 
-ThemeSync is a web-based prototype that helps product managers extract and organize themes from user interview transcripts using AI analysis. The application provides an intuitive interface for uploading research materials, analyzing them with AI, and presenting findings in a visual, interactive format similar to Miro-style post-it notes.
+Sprinthesiser is a web-based AI synthesis assistant specifically designed for Google Venture Design Sprint context. The application helps time-poor sprint facilitators (PMs, designers, engineers) analyze raw transcripts from Day 2 expert interviews and Day 4 user tests, outputting structured insights, HMW questions, and recommendations with direct traceability back to source quotes.
 
 ## User Preferences
 
@@ -29,33 +29,32 @@ Preferred communication style: Simple, everyday language.
 ### Key Components
 
 #### Data Models
-- **Projects**: Container for research sessions
-- **Transcripts**: Uploaded files with parsed content
-- **Themes**: AI-extracted themes with supporting quotes
-- **Analysis Settings**: User preferences for theme extraction
+- **Projects**: Sprint containers with goals and context
+- **Transcripts**: Uploaded files with transcript type detection (Expert Interviews vs User Testing)
+- **Themes**: AI-extracted insights categorized as Opportunities, Pain Points, or Ideas/HMWs
+- **HMW Questions**: Auto-generated "How Might We" questions for each insight
 
 #### Core Services
+- **SprintAIService**: Specialized AI service for Design Sprint insight extraction
 - **FileParserService**: Handles multiple file formats (TXT, MD, PDF, DOC, DOCX)
-- **OpenAIService**: Manages AI theme extraction with semantic clustering
-- **ExportService**: Provides data export in multiple formats (CSV, JSON)
-- **MemStorage**: In-memory data persistence (no database persistence by design)
+- **ExportService**: Provides data export for sprint documentation
+- **MemStorage**: In-memory data persistence for rapid prototyping
 
 #### UI Components
-- **FileUpload**: Drag-and-drop interface with file validation
-- **TextInput**: Direct text paste functionality
-- **AnalysisControls**: Configurable AI analysis settings
-- **ThemeGrid**: Post-it note style theme visualization
-- **ThemeCard**: Interactive theme cards with editing capabilities
-- **ExportSection**: Multiple export format options
+- **Sprint Context Panel**: Sprint goals input with dynamic context fields
+- **Transcript Input**: Enhanced textarea with file upload and type selection
+- **Insight Categories**: Three-column layout (Opportunities, Pain Points, Ideas/HMWs)
+- **HMW Display**: Shows generated "How Might We" questions for each insight
+- **Responsive Layout**: Mobile-first design with adaptive grid system
 
 ## Data Flow
 
-1. **Input Phase**: Users either paste text directly or upload files through drag-and-drop
-2. **Processing Phase**: Files are parsed and validated, content is cleaned for AI analysis
-3. **Analysis Phase**: OpenAI processes combined transcript content using semantic clustering
-4. **Presentation Phase**: AI-extracted themes are displayed as interactive post-it note cards
-5. **Refinement Phase**: Users can edit, merge, split, and reorder themes
-6. **Export Phase**: Final results can be exported in multiple formats
+1. **Sprint Context**: Users input sprint goals and optional context information
+2. **Transcript Input**: Content uploaded via file or pasted directly with type selection
+3. **AI Analysis**: Specialized Sprint AI categorizes insights into three Design Sprint categories
+4. **HMW Generation**: Automatic "How Might We" question generation for each insight
+5. **Insight Display**: Results shown in categorized columns with traceability to source quotes
+6. **Collaboration**: Built-in voting and export functionality for team collaboration
 
 ## External Dependencies
 
@@ -93,13 +92,15 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 ### Latest Updates (January 2025)
-- **Streamlined UI Workflow**: Simplified timeline navigation to left-aligned layout for better UX
-- **Enhanced Text Input**: Made text pasting the primary input method with word/character counts and prominent analyze button
-- **File Upload Integration**: Moved file upload to secondary button in text input header for cleaner interface
-- **Sample Data System**: Added comprehensive sample themes with realistic user research data for demonstration
-- **Post-it Note Styling**: Enhanced theme cards with pastel colors, drop shadows, and authentic post-it note appearance
-- **Immediate Analysis**: Removed multi-step workflow - users can now analyze themes directly after pasting text
-- **API Endpoint Fixes**: Added missing POST /api/themes endpoint and fixed theme creation data structure
+- **Complete Design Sprint Pivot**: Transformed from general research tool to Design Sprint-specific synthesis assistant
+- **Sprint-Focused Branding**: Rebranded to "Sprinthesiser" with Sprint-appropriate UI and messaging
+- **Three-Category System**: Implemented Opportunities (green), Pain Points (red), Ideas/HMWs (yellow) categorization
+- **Responsive Mobile Design**: Mobile-first responsive layout with adaptive grid system and touch-friendly controls
+- **Enhanced Context Input**: Expandable sprint goals textarea and dynamic context field management
+- **Transcript Type Selection**: Radio button selection for Expert Interviews vs Testing Notes
+- **HMW Question Generation**: Automatic "How Might We" question creation for each insight
+- **File Upload Integration**: Working file upload functionality with hidden input and upload button
+- **Specialized AI Service**: Custom SprintAIService for Design Sprint-specific insight extraction
 
 ### Key Architectural Decisions
 
