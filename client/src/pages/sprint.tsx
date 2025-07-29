@@ -7,12 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Upload, Plus, Vote, Download, X } from "lucide-react";
-import { Project, Theme, Quote } from "@shared/schema";
+import { Project, Theme } from "@shared/schema";
 import { queryClient } from "@/lib/queryClient";
 import { EnhancedThemeCard } from "@/components/EnhancedThemeCard";
 import { SprintStatistics } from "@/components/SprintStatistics";
 import { SprintFilters, FilterState } from "@/components/SprintFilters";
-import { TranscriptModal } from "@/components/TranscriptModal";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
@@ -28,8 +27,6 @@ export default function SprintPage() {
     hasHMWs: null,
     hasAISuggestions: null,
   });
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
-  const [showTranscriptModal, setShowTranscriptModal] = useState(false);
   const [processingTime, setProcessingTime] = useState(0);
 
   const { data: project } = useQuery<Project>({
@@ -106,10 +103,7 @@ export default function SprintPage() {
     });
   };
 
-  const handleViewTranscript = (quote: Quote) => {
-    setSelectedQuote(quote);
-    setShowTranscriptModal(true);
-  };
+
 
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -193,7 +187,6 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
-                  onViewTranscript={handleViewTranscript}
                 />
               ))}
               {opportunities.length === 0 && (
@@ -216,7 +209,6 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
-                  onViewTranscript={handleViewTranscript}
                 />
               ))}
               {painPoints.length === 0 && (
@@ -230,7 +222,7 @@ export default function SprintPage() {
           {/* Ideas/HMWs */}
           <div className="space-y-4">
             <div className="bg-yellow-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
-              <span>{transcriptType === 'expert_interviews' ? 'IDEAS/HMWS' : 'IDEAS/NEXT STEPS'}</span>
+              <span>{transcriptType === 'expert_interviews' ? 'IDEAS' : 'IDEAS/NEXT STEPS'}</span>
               <span className="bg-yellow-700 px-2 py-1 rounded text-xs">{ideasHmws.length}</span>
             </div>
             <div className="space-y-3">
@@ -239,7 +231,6 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
-                  onViewTranscript={handleViewTranscript}
                 />
               ))}
               {ideasHmws.length === 0 && (
@@ -263,23 +254,13 @@ export default function SprintPage() {
                     key={theme.id}
                     theme={theme}
                     transcriptType={transcriptType}
-                    onViewTranscript={handleViewTranscript}
                   />
                 ))}
               </div>
             </div>
           )}
         </div>
-        
-        {/* Transcript Modal */}
-        {selectedQuote && (
-          <TranscriptModal
-            quote={selectedQuote}
-            transcriptContent={transcriptContent}
-            isOpen={showTranscriptModal}
-            onOpenChange={setShowTranscriptModal}
-          />
-        )}
+
       </div>
     );
   };
