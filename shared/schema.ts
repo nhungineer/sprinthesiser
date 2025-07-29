@@ -35,7 +35,8 @@ export const themes = pgTable("themes", {
   color: text("color").notNull(),
   quotes: jsonb("quotes").$type<Quote[]>().notNull(),
   hmwQuestions: text("hmw_questions").array(), // How Might We questions
-  category: text("category").notNull(), // 'opportunities', 'pain_points', 'ideas_hmws'
+  aiSuggestedSteps: text("ai_suggested_steps").array(), // AI-suggested next steps
+  category: text("category").notNull(), // 'opportunities', 'pain_points', 'ideas_hmws', 'generic'
   votes: integer("votes").default(0),
   position: integer("position").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),

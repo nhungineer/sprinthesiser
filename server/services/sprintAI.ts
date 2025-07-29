@@ -5,8 +5,9 @@ export interface SprintTheme {
   title: string;
   description?: string;
   quotes: Quote[];
-  category: 'opportunities' | 'pain_points' | 'ideas_hmws';
+  category: 'opportunities' | 'pain_points' | 'ideas_hmws' | 'generic';
   hmwQuestions?: string[];
+  aiSuggestedSteps?: string[];
   color: string;
 }
 
@@ -39,8 +40,9 @@ export class SprintAIService {
           {
             "title": "Brief insight title",
             "description": "Detailed description", 
-            "category": "opportunities|pain_points|ideas_hmws",
+            "category": "opportunities|pain_points|ideas_hmws|generic",
             "hmwQuestions": ["How might we...", "How might we..."],
+            "aiSuggestedSteps": ["Recommendation 1", "Next step 2"],
             "quotes": [{"text": "quote", "source": "source", "transcriptId": 1}]
           }
         ]
@@ -74,6 +76,7 @@ export class SprintAIService {
       'opportunities': '#22c55e', // green
       'pain_points': '#ef4444',   // red
       'ideas_hmws': '#eab308',    // yellow
+      'generic': '#3b82f6',       // blue
     };
     return colorMap[category as keyof typeof colorMap] || '#6b7280';
   }
@@ -89,6 +92,11 @@ export class SprintAIService {
           "How might we simplify mobile checkout?",
           "How might we reduce cart abandonment?"
         ],
+        aiSuggestedSteps: [
+          "Create simplified one-page checkout flow",
+          "A/B test mobile-optimized payment forms",
+          "Add progress indicators to checkout steps"
+        ],
         quotes: [
           { text: "The checkout process on mobile is really confusing", source: "User 1", transcriptId: 1 },
           { text: "I gave up trying to buy because it was too complex", source: "User 2", transcriptId: 1 }
@@ -103,6 +111,11 @@ export class SprintAIService {
           "How might we showcase social proof?",
           "How might we build community around purchases?"
         ],
+        aiSuggestedSteps: [
+          "Add customer reviews and ratings",
+          "Show recent purchase activity",
+          "Create user-generated content gallery"
+        ],
         quotes: [
           { text: "I'd love to see what other people bought", source: "User 3", transcriptId: 1 },
           { text: "Reviews from real customers would help me decide", source: "User 4", transcriptId: 1 }
@@ -116,6 +129,11 @@ export class SprintAIService {
         hmwQuestions: [
           "How might we use AI to personalize experiences?",
           "How might we predict what users want next?"
+        ],
+        aiSuggestedSteps: [
+          "Implement machine learning recommendation engine",
+          "Track user behavior patterns and preferences",
+          "Create dynamic product suggestion algorithms"
         ],
         quotes: [
           { text: "I wish the site knew what I was looking for", source: "User 5", transcriptId: 1 }

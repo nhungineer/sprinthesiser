@@ -118,6 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           quotes: theme.quotes,
           category: theme.category,
           hmwQuestions: theme.hmwQuestions || [],
+          aiSuggestedSteps: theme.aiSuggestedSteps || [],
           position: i,
         });
         storedThemes.push(storedTheme);

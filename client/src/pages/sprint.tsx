@@ -7,8 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Upload, Plus, Vote, Download, X } from "lucide-react";
-import { Project, Theme } from "@shared/schema";
+import { Project, Theme, Quote } from "@shared/schema";
 import { queryClient } from "@/lib/queryClient";
+import { EnhancedThemeCard } from "@/components/EnhancedThemeCard";
+import { SprintStatistics } from "@/components/SprintStatistics";
+import { SprintFilters, FilterState } from "@/components/SprintFilters";
+import { TranscriptModal } from "@/components/TranscriptModal";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
@@ -17,6 +21,16 @@ export default function SprintPage() {
   const [transcriptType, setTranscriptType] = useState<'expert_interviews' | 'testing_notes'>('expert_interviews');
   const [currentStep, setCurrentStep] = useState<'context' | 'transcript' | 'insights'>('context');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    searchTerm: '',
+    category: 'all',
+    hasQuotes: null,
+    hasHMWs: null,
+    hasAISuggestions: null,
+  });
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [showTranscriptModal, setShowTranscriptModal] = useState(false);
+  const [processingTime, setProcessingTime] = useState(0);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -82,105 +96,190 @@ export default function SprintPage() {
   const handleSynthesize = async () => {
     if (!transcriptContent.trim()) return;
     
+    const startTime = Date.now();
     setIsAnalyzing(true);
+    setProcessingTime(0);
+    
     synthesizeMutation.mutate({ 
       content: transcriptContent, 
       sprintGoal: sprintGoal 
     });
   };
 
+  const handleViewTranscript = (quote: Quote) => {
+    setSelectedQuote(quote);
+    setShowTranscriptModal(true);
+  };
+
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+  const filterThemes = (themes: Theme[]) => {
+    return themes.filter(theme => {
+      // Search filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const titleMatch = theme.title.toLowerCase().includes(searchLower);
+        const descMatch = theme.description?.toLowerCase().includes(searchLower);
+        const quotesMatch = theme.quotes?.some(q => q.text.toLowerCase().includes(searchLower));
+        const hmwMatch = theme.hmwQuestions?.some(h => h.toLowerCase().includes(searchLower));
+        const aiMatch = theme.aiSuggestedSteps?.some(s => s.toLowerCase().includes(searchLower));
+        
+        if (!titleMatch && !descMatch && !quotesMatch && !hmwMatch && !aiMatch) {
+          return false;
+        }
+      }
+
+      // Category filter
+      if (filters.category !== 'all' && theme.category !== filters.category) {
+        return false;
+      }
+
+      // Has quotes filter
+      if (filters.hasQuotes !== null) {
+        const hasQuotes = (theme.quotes?.length || 0) > 0;
+        if (filters.hasQuotes !== hasQuotes) return false;
+      }
+
+      // Has HMWs filter
+      if (filters.hasHMWs !== null) {
+        const hasHMWs = (theme.hmwQuestions?.length || 0) > 0;
+        if (filters.hasHMWs !== hasHMWs) return false;
+      }
+
+      // Has AI suggestions filter
+      if (filters.hasAISuggestions !== null) {
+        const hasAI = (theme.aiSuggestedSteps?.length || 0) > 0;
+        if (filters.hasAISuggestions !== hasAI) return false;
+      }
+
+      return true;
+    });
+  };
+
   const renderInsightCategories = () => {
-    const opportunities = themes.filter(t => t.category === 'opportunities');
-    const painPoints = themes.filter(t => t.category === 'pain_points');
-    const ideasHmws = themes.filter(t => t.category === 'ideas_hmws');
+    const filteredThemes = filterThemes(themes);
+    const opportunities = filteredThemes.filter(t => t.category === 'opportunities');
+    const painPoints = filteredThemes.filter(t => t.category === 'pain_points');
+    const ideasHmws = filteredThemes.filter(t => t.category === 'ideas_hmws');
+    const generic = filteredThemes.filter(t => t.category === 'generic');
 
     return (
       <div className="flex-1 space-y-6">
-        <h2 className="text-2xl font-semibold text-gray-800">SPRINT INSIGHTS</h2>
-        <p className="text-gray-600">AI-powered synthesis assistant for Google Design Sprints.</p>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl lg:text-2xl font-semibold text-gray-800">SPRINT INSIGHTS</h2>
+            <p className="text-sm lg:text-base text-gray-600">AI-powered synthesis assistant for Google Design Sprints.</p>
+          </div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        {/* Statistics Overview */}
+        <SprintStatistics themes={themes} processingTime={processingTime} />
+        
+        {/* Filters */}
+        <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
           {/* Opportunities */}
           <div className="space-y-4">
-            <div className="bg-black text-white px-4 py-2 text-sm font-medium rounded">
-              OPPORTUNITIES
+            <div className="bg-green-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
+              <span>{transcriptType === 'expert_interviews' ? 'OPPORTUNITIES' : 'WHAT WORKED'}</span>
+              <span className="bg-green-700 px-2 py-1 rounded text-xs">{opportunities.length}</span>
             </div>
-            <div className="grid gap-3">
-              {opportunities.length > 0 ? (
-                opportunities.map((theme) => (
-                  <Card key={theme.id} className="bg-green-200 border-green-300 p-4">
-                    <h4 className="font-medium text-green-900">{theme.title}</h4>
-                    {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {theme.hmwQuestions.map((hmw, idx) => (
-                          <p key={idx} className="text-sm text-green-800">HMW: {hmw}</p>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
-                ))
-              ) : (
-                Array.from({ length: 3 }).map((_, i) => (
-                  <Card key={i} className="bg-green-200 border-green-300 h-20"></Card>
-                ))
+            <div className="space-y-3">
+              {opportunities.map((theme) => (
+                <EnhancedThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  transcriptType={transcriptType}
+                  onViewTranscript={handleViewTranscript}
+                />
+              ))}
+              {opportunities.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm">No opportunities found</p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Pain Points */}
           <div className="space-y-4">
-            <div className="bg-black text-white px-4 py-2 text-sm font-medium rounded">
-              PAIN POINTS
+            <div className="bg-red-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
+              <span>{transcriptType === 'expert_interviews' ? 'PAIN POINTS' : "DIDN'T WORK"}</span>
+              <span className="bg-red-700 px-2 py-1 rounded text-xs">{painPoints.length}</span>
             </div>
-            <div className="grid gap-3">
-              {painPoints.length > 0 ? (
-                painPoints.map((theme) => (
-                  <Card key={theme.id} className="bg-red-200 border-red-300 p-4">
-                    <h4 className="font-medium text-red-900">{theme.title}</h4>
-                    {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {theme.hmwQuestions.map((hmw, idx) => (
-                          <p key={idx} className="text-sm text-red-800">HMW: {hmw}</p>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
-                ))
-              ) : (
-                Array.from({ length: 3 }).map((_, i) => (
-                  <Card key={i} className="bg-red-200 border-red-300 h-20"></Card>
-                ))
+            <div className="space-y-3">
+              {painPoints.map((theme) => (
+                <EnhancedThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  transcriptType={transcriptType}
+                  onViewTranscript={handleViewTranscript}
+                />
+              ))}
+              {painPoints.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm">No pain points found</p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Ideas/HMWs */}
           <div className="space-y-4">
-            <div className="bg-black text-white px-4 py-2 text-sm font-medium rounded">
-              IDEAS/HMWS
+            <div className="bg-yellow-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
+              <span>{transcriptType === 'expert_interviews' ? 'IDEAS/HMWS' : 'IDEAS/NEXT STEPS'}</span>
+              <span className="bg-yellow-700 px-2 py-1 rounded text-xs">{ideasHmws.length}</span>
             </div>
-            <div className="grid gap-3">
-              {ideasHmws.length > 0 ? (
-                ideasHmws.map((theme) => (
-                  <Card key={theme.id} className="bg-yellow-200 border-yellow-300 p-4">
-                    <h4 className="font-medium text-yellow-900">{theme.title}</h4>
-                    {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {theme.hmwQuestions.map((hmw, idx) => (
-                          <p key={idx} className="text-sm text-yellow-800">HMW: {hmw}</p>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
-                ))
-              ) : (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i} className="bg-yellow-200 border-yellow-300 h-20"></Card>
-                ))
+            <div className="space-y-3">
+              {ideasHmws.map((theme) => (
+                <EnhancedThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  transcriptType={transcriptType}
+                  onViewTranscript={handleViewTranscript}
+                />
+              ))}
+              {ideasHmws.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm">No ideas found</p>
+                </div>
               )}
             </div>
           </div>
+
+          {/* Generic */}
+          {generic.length > 0 && (
+            <div className="space-y-4">
+              <div className="bg-blue-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
+                <span>GENERIC</span>
+                <span className="bg-blue-700 px-2 py-1 rounded text-xs">{generic.length}</span>
+              </div>
+              <div className="space-y-3">
+                {generic.map((theme) => (
+                  <EnhancedThemeCard
+                    key={theme.id}
+                    theme={theme}
+                    transcriptType={transcriptType}
+                    onViewTranscript={handleViewTranscript}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+        
+        {/* Transcript Modal */}
+        {selectedQuote && (
+          <TranscriptModal
+            quote={selectedQuote}
+            transcriptContent={transcriptContent}
+            isOpen={showTranscriptModal}
+            onOpenChange={setShowTranscriptModal}
+          />
+        )}
       </div>
     );
   };
