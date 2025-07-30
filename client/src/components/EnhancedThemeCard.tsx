@@ -169,8 +169,8 @@ export function EnhancedThemeCard({
           </div>
         </div>
 
-        {/* AI Content - Only show on hover */}
-        {isHovered && (
+        {/* AI Content - Show on hover or always during voting */}
+        {(isHovered || activeVotingSession?.isActive) && (
           <div className="space-y-3" data-hover-content>
             {/* Combined AI Suggestions */}
             {((theme.hmwQuestions && theme.hmwQuestions.length > 0) || (theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0)) && (

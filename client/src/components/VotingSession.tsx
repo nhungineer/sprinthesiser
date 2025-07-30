@@ -78,7 +78,7 @@ export function VotingSession({ session, onSessionEnd }: VotingSessionProps) {
     }
   };
 
-  const copyVotingLink = () => {
+  const handleShareLink = () => {
     const votingUrl = `${window.location.origin}/vote/${session.id}`;
     navigator.clipboard.writeText(votingUrl);
     toast({
@@ -95,60 +95,55 @@ export function VotingSession({ session, onSessionEnd }: VotingSessionProps) {
   };
 
   return (
-    <Card className="border-l-4 border-l-blue-500">
-      <CardHeader className="pb-3">
+    <Card className="mb-6 bg-blue-50 border-blue-200">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            {session.name}
-          </CardTitle>
-          <Badge className={`${getStatusColor()} text-white`}>
-            {session.isActive ? 'Active' : 'Ended'}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {session.isActive && (
-          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600" />
-              <span className="font-mono text-lg font-bold text-blue-800">
+          <div className="flex items-center gap-3">
+            <Users className="w-4 h-4 text-blue-600" />
+            <span className="font-medium text-blue-800">{session.name}</span>
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              Active
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 text-blue-800">
+              <Clock className="w-4 h-4" />
+              <span className="font-mono font-semibold">
                 {formatTime(timeRemaining)}
               </span>
               <span className="text-sm text-blue-600">remaining</span>
             </div>
-            <Button
-              variant="outline"
+            
+            <Button 
+              variant="outline" 
               size="sm"
-              onClick={copyVotingLink}
-              className="text-blue-600 border-blue-200 hover:bg-blue-100"
+              onClick={handleShareLink}
             >
-              <Share2 className="w-4 h-4 mr-2" />
+              <Share2 className="w-4 h-4 mr-1" />
               Share Link
             </Button>
-          </div>
-        )}
-
-        <div className="text-sm text-gray-600 space-y-1">
-          <p>• Team members can vote on any insight, quote, or AI suggestion</p>
-          <p>• Cards automatically reorder by vote count in real-time</p>
-          <p>• Anonymous voting ensures honest feedback</p>
-          <p>• All votes are cleared when the session ends</p>
-        </div>
-
-        {session.isActive && (
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="destructive"
+            
+            <Button 
+              variant="destructive" 
+              size="sm"
               onClick={handleEndSession}
               disabled={isEnding}
-              className="flex-1"
             >
-              <StopCircle className="w-4 h-4 mr-2" />
-              {isEnding ? 'Ending...' : 'End Session'}
+              {isEnding ? (
+                <>
+                  <Square className="w-4 h-4 mr-1 animate-spin" />
+                  Ending...
+                </>
+              ) : (
+                <>
+                  <StopCircle className="w-4 h-4 mr-1" />
+                  End Session
+                </>
+              )}
             </Button>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

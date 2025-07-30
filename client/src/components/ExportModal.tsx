@@ -12,9 +12,10 @@ interface ExportModalProps {
   onOpenChange: (open: boolean) => void;
   transcriptType: 'expert_interviews' | 'testing_notes';
   sprintGoal?: string;
+  voteCounts?: { [key: string]: number };
 }
 
-export function ExportModal({ isOpen, onOpenChange, transcriptType, sprintGoal }: ExportModalProps) {
+export function ExportModal({ isOpen, onOpenChange, transcriptType, sprintGoal, voteCounts }: ExportModalProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<string>("");
 
@@ -29,7 +30,8 @@ export function ExportModal({ isOpen, onOpenChange, transcriptType, sprintGoal }
         body: JSON.stringify({
           format,
           transcriptType,
-          sprintGoal
+          sprintGoal,
+          voteCounts
         }),
       });
 
@@ -63,7 +65,8 @@ export function ExportModal({ isOpen, onOpenChange, transcriptType, sprintGoal }
         },
         body: JSON.stringify({
           transcriptType,
-          sprintGoal
+          sprintGoal,
+          voteCounts
         }),
       });
 

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Upload, Plus, Vote, Download, X } from "lucide-react";
+import { Upload, Plus, Vote, Download, X, CheckSquare } from "lucide-react";
 import { Project, Theme, Quote, VotingSession as VotingSessionType } from "@shared/schema";
 import { TranscriptModal } from "@/components/TranscriptModal";
 import { queryClient } from "@/lib/queryClient";
@@ -292,6 +293,31 @@ export default function SprintPage() {
           />
         )}
 
+        {/* Show results if session just ended and we have vote counts */}
+        {!activeSession?.isActive && Object.keys(voteCounts).length > 0 && (
+          <Card className="mb-6 bg-green-50 border-green-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5 text-green-600" />
+                  <span className="font-medium text-green-800">Voting Results Available</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    Final Results
+                  </Badge>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setVoteCounts({})}
+                  className="text-green-600 border-green-300"
+                >
+                  Clear Results
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Filters */}
         <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
         
@@ -418,6 +444,7 @@ export default function SprintPage() {
           onOpenChange={setShowExportModal}
           transcriptType={transcriptType}
           sprintGoal={sprintGoal}
+          voteCounts={voteCounts}
         />
         
         {/* Voting Modal */}

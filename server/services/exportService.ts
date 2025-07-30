@@ -5,11 +5,12 @@ export interface ExportData {
   transcriptType: 'expert_interviews' | 'testing_notes';
   sprintGoal?: string;
   exportDate: string;
+  voteCounts?: { [key: string]: number };
 }
 
 export class ExportService {
   static generateTextExport(data: ExportData): string {
-    const { themes, transcriptType, sprintGoal, exportDate } = data;
+    const { themes, transcriptType, sprintGoal, exportDate, voteCounts = {} } = data;
     
     let output = `SPRINT INSIGHTS EXPORT\n`;
     output += `Generated: ${exportDate}\n`;
@@ -29,6 +30,12 @@ export class ExportService {
       output += `${theme.title}\n`;
       if (theme.description) {
         output += `${theme.description}\n`;
+      }
+      
+      // Vote count if available
+      const themeVotes = voteCounts[`theme-${theme.id}`];
+      if (themeVotes > 0) {
+        output += `VOTES: ${themeVotes}\n`;
       }
       output += `\n`;
 
@@ -50,14 +57,18 @@ export class ExportService {
         output += `AI SUGGESTIONS (${suggestionLabel}):\n`;
         
         if (theme.hmwQuestions && theme.hmwQuestions.length > 0) {
-          theme.hmwQuestions.forEach(hmw => {
-            output += `- ${hmw}\n`;
+          theme.hmwQuestions.forEach((hmw, idx) => {
+            const votes = voteCounts[`theme-${theme.id}-hmw-${idx}`];
+            const voteText = votes > 0 ? ` (${votes} votes)` : '';
+            output += `- ${hmw}${voteText}\n`;
           });
         }
         
         if (theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0) {
-          theme.aiSuggestedSteps.forEach(step => {
-            output += `- ${step}\n`;
+          theme.aiSuggestedSteps.forEach((step, idx) => {
+            const votes = voteCounts[`theme-${theme.id}-ai_step-${idx}`];
+            const voteText = votes > 0 ? ` (${votes} votes)` : '';
+            output += `- ${step}${voteText}\n`;
           });
         }
         output += `\n`;
@@ -130,32 +141,42 @@ export class ExportService {
   }
 
   static generateCSVExport(data: ExportData): string {
-    const { themes, transcriptType, exportDate } = data;
+    const { themes, transcriptType, exportDate, voteCounts = {} } = data;
     
     // CSV Headers
-    let csv = 'Insight Heading,Type,Raw Quotes,AI Suggestions,Source,Date and Time of Synthesis\n';
+    let csv = 'Insight Heading,Type,Vote Count,Raw Quotes,AI Suggestions,Source,Date and Time of Synthesis\n';
     
     themes.forEach(theme => {
       const categoryLabel = this.getCategoryLabel(theme.category, transcriptType);
       const heading = this.escapeCSV(theme.title);
       const type = this.escapeCSV(categoryLabel);
       
+      // Vote count for the theme
+      const themeVotes = voteCounts[`theme-${theme.id}`] || 0;
+      
       // Combine all quotes
       const quotes = theme.quotes?.map(q => `"${q.text}" - ${q.source}`).join('; ') || '';
       const quotesEscaped = this.escapeCSV(quotes);
       
-      // Combine all AI suggestions
-      const suggestions = [
-        ...(theme.hmwQuestions || []),
-        ...(theme.aiSuggestedSteps || [])
-      ].join('; ');
+      // Combine all AI suggestions with vote counts
+      const hmwSuggestions = (theme.hmwQuestions || []).map((hmw, idx) => {
+        const votes = voteCounts[`theme-${theme.id}-hmw-${idx}`];
+        return votes > 0 ? `${hmw} (${votes} votes)` : hmw;
+      });
+      
+      const stepSuggestions = (theme.aiSuggestedSteps || []).map((step, idx) => {
+        const votes = voteCounts[`theme-${theme.id}-ai_step-${idx}`];
+        return votes > 0 ? `${step} (${votes} votes)` : step;
+      });
+      
+      const suggestions = [...hmwSuggestions, ...stepSuggestions].join('; ');
       const suggestionsEscaped = this.escapeCSV(suggestions);
       
       // Sources (unique)
       const sources = Array.from(new Set(theme.quotes?.map(q => q.source) || [])).join('; ');
       const sourcesEscaped = this.escapeCSV(sources);
       
-      csv += `${heading},${type},${quotesEscaped},${suggestionsEscaped},${sourcesEscaped},${exportDate}\n`;
+      csv += `${heading},${type},${themeVotes},${quotesEscaped},${suggestionsEscaped},${sourcesEscaped},${exportDate}\n`;
     });
     
     return csv;
