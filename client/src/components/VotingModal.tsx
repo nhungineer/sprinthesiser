@@ -18,7 +18,7 @@ interface VotingModalProps {
 
 export function VotingModal({ isOpen, onOpenChange, projectId, onSessionCreated }: VotingModalProps) {
   const [sessionName, setSessionName] = useState("");
-  const [duration, setDuration] = useState("15");
+  const [duration, setDuration] = useState("5");
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
@@ -62,7 +62,7 @@ export function VotingModal({ isOpen, onOpenChange, projectId, onSessionCreated 
       
       // Reset form
       setSessionName("");
-      setDuration("15");
+      setDuration("5");
     } catch (error) {
       console.error('Create session error:', error);
       toast({
