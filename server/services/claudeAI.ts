@@ -55,7 +55,7 @@ Interview Context: Day 2 Expert Interviews - Industry experts sharing knowledge 
 
 {{transcriptContent}}
 
-Return JSON with this exact structure:
+CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structure:
 {
   "themes": [
     {
@@ -92,7 +92,7 @@ Testing Context: Day 4 User Testing - Real users interacting with prototype/solu
 
 {{transcriptContent}}
 
-Return JSON with this exact structure:
+CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structure:
 {
   "themes": [
     {
@@ -180,7 +180,35 @@ Return JSON with this exact structure:
         throw new Error('No text content received from Claude');
       }
       
-      const result = JSON.parse(textContent.text || '{"themes": []}');
+      // Extract and clean JSON response
+      let jsonStr = textContent.text || '{"themes": []}';
+      
+      // Try to extract from code blocks first
+      const jsonMatch = jsonStr.match(/```json\n([\s\S]*?)\n```/) || 
+                       jsonStr.match(/```\n([\s\S]*?)\n```/);
+      
+      if (jsonMatch) {
+        jsonStr = jsonMatch[1];
+      }
+      
+      // Clean up common JSON formatting issues
+      jsonStr = jsonStr.trim()
+        .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+        .replace(/([{\[,]\s*)(\w+):/g, '$1"$2":') // Quote unquoted keys
+        .replace(/:\s*'([^']*)'/g, ': "$1"') // Replace single quotes with double quotes
+        .replace(/\n\s*\n/g, '\n'); // Remove empty lines
+      
+      let result;
+      try {
+        result = JSON.parse(jsonStr);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError);
+        console.error('Raw response:', textContent.text.substring(0, 500) + '...');
+        console.error('Cleaned JSON:', jsonStr.substring(0, 500) + '...');
+        
+        // Fallback: return empty structure if JSON parsing fails
+        result = { themes: [] };
+      }
       
       return result.themes?.map((theme: any) => ({
         ...theme,
