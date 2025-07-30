@@ -120,12 +120,12 @@ export function EnhancedThemeCard({
         {/* AI Content - Only show on hover */}
         {isHovered && (
           <div className="space-y-3">
-            {/* AI HMWs */}
+            {/* AI Suggestions - HMW Questions for Expert Interviews */}
             {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
               <div className="space-y-2">
                 <h5 className="text-sm font-medium text-gray-700 flex items-center gap-1">
                   <Brain className="w-4 h-4" />
-                  HMWs
+                  AI Suggestions
                 </h5>
                 <div className="space-y-1">
                   {theme.hmwQuestions.map((hmw, idx) => (
@@ -137,12 +137,12 @@ export function EnhancedThemeCard({
               </div>
             )}
 
-            {/* AI Next Steps */}
+            {/* AI Suggestions - Next Steps for Testing Notes */}
             {theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0 && (
               <div className="space-y-2">
                 <h5 className="text-sm font-medium text-gray-700 flex items-center gap-1">
                   <Brain className="w-4 h-4" />
-                  Next Steps
+                  AI Suggestions
                 </h5>
                 <div className="space-y-2">
                   {theme.aiSuggestedSteps.map((step, idx) => (

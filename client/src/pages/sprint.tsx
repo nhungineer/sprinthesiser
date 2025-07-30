@@ -24,9 +24,6 @@ export default function SprintPage() {
   const [filters, setFilters] = useState<FilterState>({
     searchTerm: '',
     category: 'all',
-    hasQuotes: null,
-    hasHMWs: null,
-    hasAISuggestions: null,
   });
   const [processingTime, setProcessingTime] = useState(0);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
@@ -136,24 +133,6 @@ export default function SprintPage() {
       // Category filter
       if (filters.category !== 'all' && theme.category !== filters.category) {
         return false;
-      }
-
-      // Has quotes filter
-      if (filters.hasQuotes !== null) {
-        const hasQuotes = (theme.quotes?.length || 0) > 0;
-        if (filters.hasQuotes !== hasQuotes) return false;
-      }
-
-      // Has HMWs filter
-      if (filters.hasHMWs !== null) {
-        const hasHMWs = (theme.hmwQuestions?.length || 0) > 0;
-        if (filters.hasHMWs !== hasHMWs) return false;
-      }
-
-      // Has AI suggestions filter
-      if (filters.hasAISuggestions !== null) {
-        const hasAI = (theme.aiSuggestedSteps?.length || 0) > 0;
-        if (filters.hasAISuggestions !== hasAI) return false;
       }
 
       return true;

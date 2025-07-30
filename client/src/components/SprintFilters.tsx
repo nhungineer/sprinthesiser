@@ -13,21 +13,15 @@ interface SprintFiltersProps {
 export interface FilterState {
   searchTerm: string;
   category: string;
-  hasQuotes: boolean | null;
-  hasHMWs: boolean | null;
-  hasAISuggestions: boolean | null;
 }
 
 export function SprintFilters({ onFilterChange, transcriptType }: SprintFiltersProps) {
   const [filters, setFilters] = useState<FilterState>({
     searchTerm: '',
     category: 'all',
-    hasQuotes: null,
-    hasHMWs: null,
-    hasAISuggestions: null,
   });
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+
 
   const getCategoryOptions = () => {
     if (transcriptType === 'expert_interviews') {
@@ -59,9 +53,6 @@ export function SprintFilters({ onFilterChange, transcriptType }: SprintFiltersP
     const resetFilters: FilterState = {
       searchTerm: '',
       category: 'all',
-      hasQuotes: null,
-      hasHMWs: null,
-      hasAISuggestions: null,
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
@@ -70,9 +61,6 @@ export function SprintFilters({ onFilterChange, transcriptType }: SprintFiltersP
   const activeFilterCount = [
     filters.searchTerm !== '',
     filters.category !== 'all',
-    filters.hasQuotes !== null,
-    filters.hasHMWs !== null,
-    filters.hasAISuggestions !== null,
   ].filter(Boolean).length;
 
   return (
@@ -87,26 +75,17 @@ export function SprintFilters({ onFilterChange, transcriptType }: SprintFiltersP
             </Badge>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        {activeFilterCount > 0 && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowAdvanced(!showAdvanced)}
+            onClick={clearAllFilters}
+            className="text-red-600 hover:text-red-700"
           >
-            {showAdvanced ? 'Basic' : 'Advanced'}
+            <X className="w-3 h-3 mr-1" />
+            Clear
           </Button>
-          {activeFilterCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="text-red-600 hover:text-red-700"
-            >
-              <X className="w-3 h-3 mr-1" />
-              Clear
-            </Button>
-          )}
-        </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -141,79 +120,7 @@ export function SprintFilters({ onFilterChange, transcriptType }: SprintFiltersP
         </div>
       </div>
 
-      {/* Advanced Filters */}
-      {showAdvanced && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-gray-100">
-          <div>
-            <label className="text-xs font-medium text-gray-600 mb-1 block">
-              Has Quotes
-            </label>
-            <Select
-              value={filters.hasQuotes === null ? 'all' : filters.hasQuotes.toString()}
-              onValueChange={(value) => 
-                updateFilters({ 
-                  hasQuotes: value === 'all' ? null : value === 'true' 
-                })
-              }
-            >
-              <SelectTrigger className="h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="true">With Quotes</SelectItem>
-                <SelectItem value="false">No Quotes</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
-          <div>
-            <label className="text-xs font-medium text-gray-600 mb-1 block">
-              Has HMWs
-            </label>
-            <Select
-              value={filters.hasHMWs === null ? 'all' : filters.hasHMWs.toString()}
-              onValueChange={(value) => 
-                updateFilters({ 
-                  hasHMWs: value === 'all' ? null : value === 'true' 
-                })
-              }
-            >
-              <SelectTrigger className="h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="true">With HMWs</SelectItem>
-                <SelectItem value="false">No HMWs</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-xs font-medium text-gray-600 mb-1 block">
-              Has AI Steps
-            </label>
-            <Select
-              value={filters.hasAISuggestions === null ? 'all' : filters.hasAISuggestions.toString()}
-              onValueChange={(value) => 
-                updateFilters({ 
-                  hasAISuggestions: value === 'all' ? null : value === 'true' 
-                })
-              }
-            >
-              <SelectTrigger className="h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="true">With AI Steps</SelectItem>
-                <SelectItem value="false">No AI Steps</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

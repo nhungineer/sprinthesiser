@@ -39,17 +39,11 @@ export function SprintStatistics({ themes, processingTime = 0 }: SprintStatistic
           </div>
           
           <div className="flex items-center gap-2">
-            <Lightbulb className="w-4 h-4 text-yellow-600" />
-            <span className="text-lg font-bold text-yellow-600">{totalHMWs}</span>
-            <span className="text-sm text-gray-600">HMWs</span>
-          </div>
-          
-          <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-lg font-bold text-purple-600">{totalAISuggestions}</span>
-            <span className="text-sm text-gray-600">AI steps</span>
+            <span className="text-lg font-bold text-purple-600">{totalHMWs + totalAISuggestions}</span>
+            <span className="text-sm text-gray-600">AI suggestions</span>
           </div>
         </div>
         
