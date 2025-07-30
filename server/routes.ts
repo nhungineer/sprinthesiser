@@ -3,9 +3,10 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import { storage } from "./storage";
 import { FileParserService } from "./services/fileParser";
-import { OpenAIService } from "./services/openai";
+import { ClaudeSprintAI } from "./services/claudeAI";
 import { ExportService } from "./services/exportService";
 import { SprintAIService } from "./services/sprintAI";
+import { setupSprintRoutes } from "./routes/sprintRoutes";
 import { 
   fileUploadSchema, 
   textInputSchema, 
@@ -204,12 +205,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No transcripts found. Please upload files or add text first." });
       }
 
-      // Extract themes using OpenAI
+      // Extract themes using Claude AI
       const transcriptContents = transcripts.map(t => t.content);
-      const extractedThemes = await OpenAIService.extractThemes({
-        transcripts: transcriptContents,
-        settings: extractionRequest.settings,
-      });
+      const combinedContent = transcriptContents.join('\n\n---TRANSCRIPT BREAK---\n\n');
+      const extractedThemes = await ClaudeSprintAI.extractSprintInsights(
+        combinedContent,
+        'expert_interviews'
+      );
 
       // Store themes in database
       const storedThemes = [];
@@ -221,8 +223,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: theme.description,
           color: theme.color,
           quotes: theme.quotes,
-          category: 'opportunities', // Default category for Design Sprint
+          category: theme.category,
           position: i,
+          hmwQuestions: theme.hmwQuestions,
+          aiSuggestedSteps: theme.aiSuggestedSteps,
         });
         storedThemes.push(storedTheme);
       }
@@ -239,9 +243,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Theme extraction error:", error);
-      res.status(500).json({ message: "Failed to extract themes", error: error.message });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ message: "Failed to extract themes", error: errorMessage });
     }
   });
+
+  // Setup Sprint-specific routes
+  setupSprintRoutes(app);
 
   // Get themes
   app.get("/api/themes", async (req, res) => {
@@ -249,7 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const themes = await storage.getThemesByProject(DEFAULT_PROJECT_ID);
       res.json(themes);
     } catch (error) {
-      res.status(500).json({ message: "Failed to get themes", error: error.message });
+      res.status(500).json({ message: "Failed to get themes", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -291,7 +299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "Theme updated successfully", theme: updatedTheme });
     } catch (error) {
-      res.status(500).json({ message: "Failed to update theme", error: error.message });
+      res.status(500).json({ message: "Failed to update theme", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 

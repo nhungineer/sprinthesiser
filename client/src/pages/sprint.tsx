@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Upload, Plus, Vote, Download, X, CheckSquare } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { Project, Theme, Quote, VotingSession as VotingSessionType } from "@shared/schema";
 import { TranscriptModal } from "@/components/TranscriptModal";
 import { queryClient } from "@/lib/queryClient";
@@ -17,6 +18,7 @@ import { SprintFilters, FilterState } from "@/components/SprintFilters";
 import { ExportModal } from "@/components/ExportModal";
 import { VotingModal } from "@/components/VotingModal";
 import { VotingSession } from "@/components/VotingSession";
+import { AIPromptSettings } from "@/components/AIPromptSettings";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
@@ -38,6 +40,7 @@ export default function SprintPage() {
   const [voteCounts, setVoteCounts] = useState<{ [key: string]: number }>({});
   const [userVotes, setUserVotes] = useState<{ [key: string]: boolean }>({});
   const [voterToken, setVoterToken] = useState<string>('');
+  const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -221,10 +224,48 @@ export default function SprintPage() {
     setIsAnalyzing(true);
     setProcessingTime(0);
     
-    synthesizeMutation.mutate({ 
-      content: transcriptContent, 
-      sprintGoal: sprintGoal 
-    });
+    try {
+      // Use real Claude AI analysis
+      const response = await fetch('/api/sprint/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcriptContent,
+          transcriptType,
+          sprintGoal: sprintGoal || undefined
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || 'Analysis failed');
+      }
+
+      const result = await response.json();
+      
+      toast({
+        title: "Analysis Complete",
+        description: `Found ${result.count} insights from your ${transcriptType === 'expert_interviews' ? 'expert interviews' : 'user testing notes'}`,
+      });
+
+      // Refresh themes display
+      queryClient.invalidateQueries({ queryKey: ["/api/themes"] });
+      setCurrentStep('insights');
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      toast({
+        title: "Analysis failed",
+        description: errorMessage.includes('API key') 
+          ? "AI analysis requires an Anthropic API key. Please check your configuration."
+          : `Analysis error: ${errorMessage}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
 
@@ -543,17 +584,20 @@ export default function SprintPage() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-800">Transcript</h3>
-                <Button variant="ghost" size="sm" className="p-1" onClick={() => document.getElementById('file-upload')?.click()}>
-                  <Upload className="w-4 h-4 text-gray-500" />
-                </Button>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept=".txt,.md,.doc,.docx"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
+                <div className="flex items-center gap-2">
+                  <AIPromptSettings transcriptType={transcriptType} />
+                  <Button variant="ghost" size="sm" className="p-1" onClick={() => document.getElementById('file-upload')?.click()}>
+                    <Upload className="w-4 h-4 text-gray-500" />
+                  </Button>
+                </div>
               </div>
+              <input
+                id="file-upload"
+                type="file"
+                accept=".txt,.md,.doc,.docx"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
               
               {/* Transcript type radio buttons */}
               <div className="mb-4">
