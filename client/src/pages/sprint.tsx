@@ -13,6 +13,7 @@ import { queryClient } from "@/lib/queryClient";
 import { EnhancedThemeCard } from "@/components/EnhancedThemeCard";
 import { SprintStatistics } from "@/components/SprintStatistics";
 import { SprintFilters, FilterState } from "@/components/SprintFilters";
+import { ExportModal } from "@/components/ExportModal";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
@@ -28,6 +29,7 @@ export default function SprintPage() {
   const [processingTime, setProcessingTime] = useState(0);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [showTranscriptModal, setShowTranscriptModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -161,7 +163,7 @@ export default function SprintPage() {
         {/* Filters */}
         <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" data-export-target="insights">
           {/* Opportunities */}
           <div className="space-y-4">
             <div className="bg-green-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
@@ -265,6 +267,14 @@ export default function SprintPage() {
             onOpenChange={setShowTranscriptModal}
           />
         )}
+        
+        {/* Export Modal */}
+        <ExportModal
+          isOpen={showExportModal}
+          onOpenChange={setShowExportModal}
+          transcriptType={transcriptType}
+          sprintGoal={sprintGoal}
+        />
       </div>
     );
   };
@@ -289,7 +299,12 @@ export default function SprintPage() {
                 <Vote className="w-4 h-4 mr-2" />
                 Start Voting
               </Button>
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full sm:w-auto"
+                onClick={() => setShowExportModal(true)}
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>

@@ -119,7 +119,7 @@ export function EnhancedThemeCard({
 
         {/* AI Content - Only show on hover */}
         {isHovered && (
-          <div className="space-y-3">
+          <div className="space-y-3" data-hover-content>
             {/* AI Suggestions - HMW Questions for Expert Interviews */}
             {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
               <div className="space-y-2">

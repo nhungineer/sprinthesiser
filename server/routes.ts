@@ -4,7 +4,7 @@ import multer from "multer";
 import { storage } from "./storage";
 import { FileParserService } from "./services/fileParser";
 import { OpenAIService } from "./services/openai";
-import { ExportService } from "./services/export";
+import { ExportService } from "./services/exportService";
 import { SprintAIService } from "./services/sprintAI";
 import { 
   fileUploadSchema, 
@@ -377,6 +377,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to get analysis settings", error: error.message });
+    }
+  });
+
+  // Export routes
+  app.post("/api/export/text", async (req, res) => {
+    try {
+      const { format, transcriptType, sprintGoal } = req.body;
+      const themes = await storage.getThemesByProject(DEFAULT_PROJECT_ID);
+      
+      const exportData = {
+        themes,
+        transcriptType: transcriptType || 'expert_interviews',
+        sprintGoal,
+        exportDate: new Date().toLocaleString()
+      };
+
+      let content: string;
+      let filename: string;
+      let mimeType: string;
+
+      switch (format) {
+        case 'txt':
+          content = ExportService.generateTextExport(exportData);
+          filename = `sprint-insights-${Date.now()}.txt`;
+          mimeType = 'text/plain';
+          break;
+        case 'md':
+          content = ExportService.generateMarkdownExport(exportData);
+          filename = `sprint-insights-${Date.now()}.md`;
+          mimeType = 'text/markdown';
+          break;
+        case 'doc':
+          // For DOC format, we'll use plain text but with .doc extension
+          content = ExportService.generateTextExport(exportData);
+          filename = `sprint-insights-${Date.now()}.doc`;
+          mimeType = 'application/msword';
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid format. Use 'txt', 'md', or 'doc'" });
+      }
+
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(content);
+    } catch (error) {
+      console.error("Text export error:", error);
+      res.status(500).json({ message: "Failed to export text", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/export/csv", async (req, res) => {
+    try {
+      const { transcriptType, sprintGoal } = req.body;
+      const themes = await storage.getThemesByProject(DEFAULT_PROJECT_ID);
+      
+      const exportData = {
+        themes,
+        transcriptType: transcriptType || 'expert_interviews',
+        sprintGoal,
+        exportDate: new Date().toLocaleString()
+      };
+
+      const csvContent = ExportService.generateCSVExport(exportData);
+      const filename = `sprint-insights-${Date.now()}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(csvContent);
+    } catch (error) {
+      console.error("CSV export error:", error);
+      res.status(500).json({ message: "Failed to export CSV", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
