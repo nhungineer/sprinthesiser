@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Copy, Edit, Trash2, Quote as QuoteIcon, Brain } from "lucide-react";
-import { Theme, Quote } from "@shared/schema";
+import { Copy, Edit, Trash2, Quote as QuoteIcon, Brain, Heart, HeartHandshake } from "lucide-react";
+import { Theme, Quote, VotingSession as VotingSessionType } from "@shared/schema";
 
 interface EnhancedThemeCardProps {
   theme: Theme;
@@ -14,6 +14,10 @@ interface EnhancedThemeCardProps {
   onDeleteStep?: (themeId: number, stepIndex: number) => void;
   onViewTranscript?: (quote: Quote) => void;
   transcriptContent?: string;
+  activeVotingSession?: VotingSessionType | null;
+  voteCounts?: { [key: string]: number };
+  userVotes?: { [key: string]: boolean };
+  onVote?: (themeId: number, itemType: string, itemIndex?: number) => void;
 }
 
 export function EnhancedThemeCard({ 
@@ -22,7 +26,11 @@ export function EnhancedThemeCard({
   onEditStep, 
   onDeleteStep,
   onViewTranscript,
-  transcriptContent = ""
+  transcriptContent = "",
+  activeVotingSession,
+  voteCounts = {},
+  userVotes = {},
+  onVote
 }: EnhancedThemeCardProps) {
   const [editingStep, setEditingStep] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -80,6 +88,47 @@ export function EnhancedThemeCard({
     }
   };
 
+  const getVoteKey = (itemType: string, itemIndex?: number) => {
+    return `${theme.id}-${itemType}${itemIndex !== undefined ? `-${itemIndex}` : ''}`;
+  };
+
+  const getVoteCount = (itemType: string, itemIndex?: number) => {
+    return voteCounts[getVoteKey(itemType, itemIndex)] || 0;
+  };
+
+  const hasUserVoted = (itemType: string, itemIndex?: number) => {
+    return userVotes[getVoteKey(itemType, itemIndex)] || false;
+  };
+
+  const handleVote = (itemType: string, itemIndex?: number) => {
+    if (onVote && activeVotingSession?.isActive) {
+      onVote(theme.id, itemType, itemIndex);
+    }
+  };
+
+  const VoteButton = ({ itemType, itemIndex }: { itemType: string; itemIndex?: number }) => {
+    if (!activeVotingSession?.isActive) return null;
+    
+    const voteCount = getVoteCount(itemType, itemIndex);
+    const userVoted = hasUserVoted(itemType, itemIndex);
+    
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`h-6 px-2 text-xs transition-colors ${
+          userVoted 
+            ? 'bg-pink-100 text-pink-700 hover:bg-pink-200' 
+            : 'text-gray-500 hover:text-pink-600 hover:bg-pink-50'
+        }`}
+        onClick={() => handleVote(itemType, itemIndex)}
+      >
+        <Heart className={`w-3 h-3 mr-1 ${userVoted ? 'fill-current' : ''}`} />
+        {voteCount > 0 && voteCount}
+      </Button>
+    );
+  };
+
   return (
     <TooltipProvider>
       <Card 
@@ -88,9 +137,12 @@ export function EnhancedThemeCard({
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Title */}
-        <h4 className={`font-semibold ${categoryConfig.textColor} mb-3`}>
-          {theme.title}
-        </h4>
+        <div className="flex items-center justify-between mb-3">
+          <h4 className={`font-semibold ${categoryConfig.textColor}`}>
+            {theme.title}
+          </h4>
+          <VoteButton itemType="theme" />
+        </div>
 
         {/* Quotes */}
         <div className="space-y-2 mb-3">
@@ -129,9 +181,12 @@ export function EnhancedThemeCard({
                 </h5>
                 <div className="space-y-1">
                   {theme.hmwQuestions.map((hmw, idx) => (
-                    <p key={idx} className="text-sm text-gray-600 bg-white/50 p-2 rounded">
-                      {hmw}
-                    </p>
+                    <div key={idx} className="flex items-center justify-between bg-white/50 p-2 rounded">
+                      <p className="text-sm text-gray-600 flex-1 mr-2">
+                        {hmw}
+                      </p>
+                      <VoteButton itemType="hmw" itemIndex={idx} />
+                    </div>
                   ))}
                 </div>
               </div>

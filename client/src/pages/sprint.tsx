@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -34,6 +34,9 @@ export default function SprintPage() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [activeVotingSession, setActiveVotingSession] = useState<VotingSessionType | null>(null);
+  const [voteCounts, setVoteCounts] = useState<{ [key: string]: number }>({});
+  const [userVotes, setUserVotes] = useState<{ [key: string]: boolean }>({});
+  const [voterToken, setVoterToken] = useState<string>('');
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -48,6 +51,114 @@ export default function SprintPage() {
     enabled: currentStep === 'insights',
     refetchInterval: 5000, // Poll every 5s for real-time updates
   });
+
+  // Generate unique voter token on mount
+  React.useEffect(() => {
+    if (!voterToken) {
+      setVoterToken(`voter_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+    }
+  }, []);
+
+  // Update active session state when query data changes
+  React.useEffect(() => {
+    setActiveVotingSession(activeSession || null);
+  }, [activeSession]);
+
+  // Fetch vote counts when there's an active session
+  React.useEffect(() => {
+    if (activeSession?.id) {
+      fetchVoteCounts(activeSession.id);
+    }
+  }, [activeSession?.id, themes]);
+
+  const fetchVoteCounts = async (sessionId: number) => {
+    try {
+      const response = await fetch(`/api/voting/votes/${sessionId}`);
+      if (response.ok) {
+        const votes: any[] = await response.json();
+        
+        // Calculate vote counts
+        const counts: { [key: string]: number } = {};
+        const userVoteMap: { [key: string]: boolean } = {};
+        
+        votes.forEach(vote => {
+          const key = `${vote.themeId}-${vote.itemType}${vote.itemIndex !== null ? `-${vote.itemIndex}` : ''}`;
+          counts[key] = (counts[key] || 0) + 1;
+          
+          // Track user's votes
+          if (vote.voterToken === voterToken) {
+            userVoteMap[key] = true;
+          }
+        });
+        
+        setVoteCounts(counts);
+        setUserVotes(userVoteMap);
+      }
+    } catch (error) {
+      console.error('Failed to fetch vote counts:', error);
+    }
+  };
+
+  const handleVote = async (themeId: number, itemType: string, itemIndex?: number) => {
+    if (!activeSession?.id || !voterToken) return;
+
+    try {
+      const voteKey = `${themeId}-${itemType}${itemIndex !== undefined ? `-${itemIndex}` : ''}`;
+      const hasVoted = userVotes[voteKey];
+
+      if (hasVoted) {
+        // Remove vote
+        const response = await fetch('/api/voting/vote', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: activeSession.id,
+            themeId,
+            itemType,
+            itemIndex,
+            voterToken,
+          }),
+        });
+
+        if (response.ok) {
+          setVoteCounts(prev => ({
+            ...prev,
+            [voteKey]: Math.max(0, (prev[voteKey] || 0) - 1)
+          }));
+          setUserVotes(prev => ({
+            ...prev,
+            [voteKey]: false
+          }));
+        }
+      } else {
+        // Cast vote
+        const response = await fetch('/api/voting/vote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: activeSession.id,
+            themeId,
+            itemType,
+            itemIndex,
+            voterToken,
+          }),
+        });
+
+        if (response.ok) {
+          setVoteCounts(prev => ({
+            ...prev,
+            [voteKey]: (prev[voteKey] || 0) + 1
+          }));
+          setUserVotes(prev => ({
+            ...prev,
+            [voteKey]: true
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Voting error:', error);
+    }
+  };
 
   const synthesizeMutation = useMutation({
     mutationFn: async ({ content, sprintGoal }: { content: string; sprintGoal: string }) => {
@@ -199,6 +310,10 @@ export default function SprintPage() {
                   transcriptType={transcriptType}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
+                  activeVotingSession={activeVotingSession}
+                  voteCounts={voteCounts}
+                  userVotes={userVotes}
+                  onVote={handleVote}
                 />
               ))}
               {opportunities.length === 0 && (
@@ -223,6 +338,10 @@ export default function SprintPage() {
                   transcriptType={transcriptType}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
+                  activeVotingSession={activeVotingSession}
+                  voteCounts={voteCounts}
+                  userVotes={userVotes}
+                  onVote={handleVote}
                 />
               ))}
               {painPoints.length === 0 && (
@@ -247,6 +366,10 @@ export default function SprintPage() {
                   transcriptType={transcriptType}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
+                  activeVotingSession={activeVotingSession}
+                  voteCounts={voteCounts}
+                  userVotes={userVotes}
+                  onVote={handleVote}
                 />
               ))}
               {ideasHmws.length === 0 && (
