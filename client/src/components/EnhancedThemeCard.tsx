@@ -172,131 +172,136 @@ export function EnhancedThemeCard({
         {/* AI Content - Only show on hover */}
         {isHovered && (
           <div className="space-y-3" data-hover-content>
-            {/* AI Suggestions - HMW Questions for Expert Interviews */}
-            {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
+            {/* Combined AI Suggestions */}
+            {((theme.hmwQuestions && theme.hmwQuestions.length > 0) || (theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0)) && (
               <div className="space-y-2">
                 <h5 className="text-sm font-medium text-gray-700 flex items-center gap-1">
                   <Brain className="w-4 h-4" />
                   AI Suggestions
                 </h5>
-                <div className="space-y-1">
-                  {theme.hmwQuestions.map((hmw, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-white/50 p-2 rounded">
-                      <p className="text-sm text-gray-600 flex-1 mr-2">
-                        {hmw}
-                      </p>
-                      <VoteButton itemType="hmw" itemIndex={idx} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                
+                {/* HMW Questions */}
+                {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
+                  <div className="space-y-1">
+                    {theme.hmwQuestions.map((hmw, idx) => (
+                      <div key={`hmw-${idx}`} className="flex items-center justify-between bg-white/50 p-2 rounded">
+                        <p className="text-sm text-gray-600 flex-1 mr-2">
+                          {hmw}
+                        </p>
+                        <VoteButton itemType="hmw" itemIndex={idx} />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            {/* AI Suggestions - Next Steps for Testing Notes */}
-            {theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0 && (
-              <div className="space-y-2">
-                <h5 className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  <Brain className="w-4 h-4" />
-                  AI Suggestions
-                </h5>
-                <div className="space-y-2">
-                  {theme.aiSuggestedSteps.map((step, idx) => (
-                    <div 
-                      key={idx} 
-                      className="bg-blue-50 p-3 rounded border border-blue-200 relative"
-                      onMouseEnter={() => setHoveredStepIndex(idx)}
-                      onMouseLeave={() => setHoveredStepIndex(null)}
-                    >
-                      {editingStep === idx ? (
-                        <div className="space-y-2">
-                          <textarea
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            className="w-full p-2 text-sm border rounded resize-none"
-                            rows={2}
-                          />
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="outline" onClick={() => handleSaveEdit(idx)}>
-                              Save
+                {/* AI Suggested Steps */}
+                {theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0 && (
+                  <div className="space-y-1">
+                    {theme.aiSuggestedSteps.map((step, idx) => (
+                      <div key={`step-${idx}`} className="group" onMouseEnter={() => setHoveredStepIndex(idx)} onMouseLeave={() => setHoveredStepIndex(null)}>
+                        {editingStep === idx ? (
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              className="flex-1 px-2 py-1 text-sm border rounded"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveEdit(idx);
+                                if (e.key === 'Escape') {
+                                  setEditingStep(null);
+                                  setEditValue("");
+                                }
+                              }}
+                              autoFocus
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleSaveEdit(idx)}
+                              className="h-6 w-6 p-0"
+                            >
+                              ✓
                             </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setEditingStep(null)}>
-                              Cancel
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingStep(null);
+                                setEditValue("");
+                              }}
+                              className="h-6 w-6 p-0"
+                            >
+                              ✕
                             </Button>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-start gap-2">
-                          <p className="text-sm text-blue-800 flex-1 pr-2">{step}</p>
-                          {hoveredStepIndex === idx && (
-                            <div className="flex gap-1 shrink-0">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => handleCopyStep(step)}
-                                  >
-                                    <Copy className="w-3 h-3" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Copy</TooltipContent>
-                              </Tooltip>
-                              
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => handleEditStep(idx)}
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Edit</TooltipContent>
-                              </Tooltip>
-
-                              <AlertDialog>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
+                        ) : (
+                          <div className="flex items-center justify-between bg-white/50 p-2 rounded group-hover:bg-white/70 transition-colors">
+                            <p className="text-sm text-gray-600 flex-1 mr-2">
+                              {step}
+                            </p>
+                            <div className="flex items-center space-x-1">
+                              <VoteButton itemType="ai_step" itemIndex={idx} />
+                              {hoveredStepIndex === idx && !activeVotingSession?.isActive && (
+                                <>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleCopyStep(step)}
+                                        className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
+                                      >
+                                        <Copy className="w-3 h-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Copy</TooltipContent>
+                                  </Tooltip>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditStep(idx)}
+                                        className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
+                                      >
+                                        <Edit className="w-3 h-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Edit</TooltipContent>
+                                  </Tooltip>
+                                  <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                      <Button 
-                                        size="sm" 
-                                        variant="ghost" 
-                                        className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0 opacity-70 hover:opacity-100 hover:text-red-600"
                                       >
                                         <Trash2 className="w-3 h-3" />
                                       </Button>
                                     </AlertDialogTrigger>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Delete</TooltipContent>
-                                </Tooltip>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete AI Suggestion</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete this AI-suggested next step? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction 
-                                      onClick={() => handleDeleteStep(idx)}
-                                      className="bg-red-600 hover:bg-red-700"
-                                    >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete Step</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to delete this step? This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteStep(idx)}>Delete</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
