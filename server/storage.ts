@@ -3,10 +3,14 @@ import {
   transcripts, 
   themes, 
   analysisSettings,
+  votingSessions,
+  votes,
   type Project, 
   type Transcript, 
   type Theme, 
   type AnalysisSettings,
+  type VotingSession,
+  type Vote,
   type InsertProject, 
   type InsertTranscript, 
   type InsertTheme,
@@ -37,6 +41,19 @@ export interface IStorage {
   createAnalysisSettings(settings: InsertAnalysisSettings): Promise<AnalysisSettings>;
   getAnalysisSettings(projectId: number): Promise<AnalysisSettings | undefined>;
   updateAnalysisSettings(projectId: number, settings: Partial<InsertAnalysisSettings>): Promise<AnalysisSettings | undefined>;
+  
+  // Voting Sessions
+  createVotingSession(session: Omit<VotingSession, 'id' | 'createdAt'>): Promise<VotingSession>;
+  getVotingSessionsByProject(projectId: number): Promise<VotingSession[]>;
+  getActiveVotingSession(projectId: number): Promise<VotingSession | undefined>;
+  updateVotingSession(id: number, updates: Partial<VotingSession>): Promise<VotingSession | undefined>;
+  endVotingSession(id: number): Promise<void>;
+  
+  // Votes
+  castVote(vote: Omit<Vote, 'id' | 'createdAt'>): Promise<Vote>;
+  removeVote(sessionId: number, themeId: number, itemType: string, itemIndex: number | null, voterToken: string): Promise<void>;
+  getVotesBySession(sessionId: number): Promise<Vote[]>;
+  getVoteCount(sessionId: number, themeId: number, itemType: string, itemIndex?: number): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
@@ -44,20 +61,28 @@ export class MemStorage implements IStorage {
   private transcripts: Map<number, Transcript>;
   private themes: Map<number, Theme>;
   private analysisSettings: Map<number, AnalysisSettings>;
+  private votingSessions: Map<number, VotingSession>;
+  private votes: Map<number, Vote>;
   private currentProjectId: number;
   private currentTranscriptId: number;
   private currentThemeId: number;
   private currentSettingsId: number;
+  private currentSessionId: number;
+  private currentVoteId: number;
 
   constructor() {
     this.projects = new Map();
     this.transcripts = new Map();
     this.themes = new Map();
     this.analysisSettings = new Map();
+    this.votingSessions = new Map();
+    this.votes = new Map();
     this.currentProjectId = 1;
     this.currentTranscriptId = 1;
     this.currentThemeId = 1;
     this.currentSettingsId = 1;
+    this.currentSessionId = 1;
+    this.currentVoteId = 1;
 
     // Create default project
     this.createProject({
@@ -191,6 +216,95 @@ export class MemStorage implements IStorage {
     };
     this.analysisSettings.set(settings.id, updatedSettings);
     return updatedSettings;
+  }
+
+  // Voting Sessions
+  async createVotingSession(session: Omit<VotingSession, 'id' | 'createdAt'>): Promise<VotingSession> {
+    const id = this.currentSessionId++;
+    const newSession: VotingSession = {
+      id,
+      ...session,
+      createdAt: new Date(),
+    };
+    this.votingSessions.set(id, newSession);
+    return newSession;
+  }
+
+  async getVotingSessionsByProject(projectId: number): Promise<VotingSession[]> {
+    return Array.from(this.votingSessions.values()).filter(session => session.projectId === projectId);
+  }
+
+  async getActiveVotingSession(projectId: number): Promise<VotingSession | undefined> {
+    return Array.from(this.votingSessions.values()).find(session => 
+      session.projectId === projectId && session.isActive
+    );
+  }
+
+  async updateVotingSession(id: number, updates: Partial<VotingSession>): Promise<VotingSession | undefined> {
+    const existing = this.votingSessions.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...updates };
+    this.votingSessions.set(id, updated);
+    return updated;
+  }
+
+  async endVotingSession(id: number): Promise<void> {
+    const session = this.votingSessions.get(id);
+    if (session) {
+      session.isActive = false;
+      session.endsAt = new Date();
+      this.votingSessions.set(id, session);
+      
+      // Clear all votes for this session
+      const votesToDelete = Array.from(this.votes.entries())
+        .filter(([_, vote]) => vote.sessionId === id)
+        .map(([voteId]) => voteId);
+      
+      votesToDelete.forEach(voteId => this.votes.delete(voteId));
+    }
+  }
+
+  // Votes
+  async castVote(vote: Omit<Vote, 'id' | 'createdAt'>): Promise<Vote> {
+    // Remove existing vote from same voter for same item if exists
+    await this.removeVote(vote.sessionId, vote.themeId, vote.itemType, vote.itemIndex, vote.voterToken);
+    
+    const id = this.currentVoteId++;
+    const newVote: Vote = {
+      id,
+      ...vote,
+      createdAt: new Date(),
+    };
+    this.votes.set(id, newVote);
+    return newVote;
+  }
+
+  async removeVote(sessionId: number, themeId: number, itemType: string, itemIndex: number | null, voterToken: string): Promise<void> {
+    const votesToDelete = Array.from(this.votes.entries())
+      .filter(([_, vote]) => 
+        vote.sessionId === sessionId && 
+        vote.themeId === themeId && 
+        vote.itemType === itemType && 
+        vote.itemIndex === itemIndex && 
+        vote.voterToken === voterToken
+      )
+      .map(([voteId]) => voteId);
+    
+    votesToDelete.forEach(voteId => this.votes.delete(voteId));
+  }
+
+  async getVotesBySession(sessionId: number): Promise<Vote[]> {
+    return Array.from(this.votes.values()).filter(vote => vote.sessionId === sessionId);
+  }
+
+  async getVoteCount(sessionId: number, themeId: number, itemType: string, itemIndex?: number): Promise<number> {
+    return Array.from(this.votes.values()).filter(vote => 
+      vote.sessionId === sessionId && 
+      vote.themeId === themeId && 
+      vote.itemType === itemType && 
+      vote.itemIndex === (itemIndex ?? null)
+    ).length;
   }
 }
 

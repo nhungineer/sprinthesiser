@@ -451,6 +451,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Voting Session Routes
+  app.post("/api/voting/sessions", async (req, res) => {
+    try {
+      const { projectId, name, duration } = req.body;
+      
+      // End any existing active session for this project
+      const existingSession = await storage.getActiveVotingSession(projectId || DEFAULT_PROJECT_ID);
+      if (existingSession) {
+        await storage.endVotingSession(existingSession.id);
+      }
+
+      const session = await storage.createVotingSession({
+        projectId: projectId || DEFAULT_PROJECT_ID,
+        name,
+        duration,
+        isActive: true,
+        startsAt: new Date(),
+        endsAt: null,
+      });
+
+      res.json(session);
+    } catch (error) {
+      console.error("Create voting session error:", error);
+      res.status(500).json({ message: "Failed to create voting session", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.get("/api/voting/sessions/:projectId/active", async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.projectId) || DEFAULT_PROJECT_ID;
+      const session = await storage.getActiveVotingSession(projectId);
+      res.json(session || null);
+    } catch (error) {
+      console.error("Get active session error:", error);
+      res.status(500).json({ message: "Failed to get active session", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/voting/sessions/:id/end", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.endVotingSession(id);
+      res.json({ message: "Session ended successfully" });
+    } catch (error) {
+      console.error("End session error:", error);
+      res.status(500).json({ message: "Failed to end session", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Voting Routes
+  app.post("/api/voting/vote", async (req, res) => {
+    try {
+      const { sessionId, themeId, itemType, itemIndex, voterToken } = req.body;
+      
+      const session = await storage.getActiveVotingSession(DEFAULT_PROJECT_ID);
+      if (!session || session.id !== sessionId) {
+        return res.status(400).json({ message: "Invalid or inactive voting session" });
+      }
+
+      const vote = await storage.castVote({
+        sessionId,
+        themeId,
+        itemType,
+        itemIndex: itemIndex || null,
+        voterToken,
+      });
+
+      res.json(vote);
+    } catch (error) {
+      console.error("Cast vote error:", error);
+      res.status(500).json({ message: "Failed to cast vote", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.delete("/api/voting/vote", async (req, res) => {
+    try {
+      const { sessionId, themeId, itemType, itemIndex, voterToken } = req.body;
+      
+      await storage.removeVote(sessionId, themeId, itemType, itemIndex || null, voterToken);
+      res.json({ message: "Vote removed successfully" });
+    } catch (error) {
+      console.error("Remove vote error:", error);
+      res.status(500).json({ message: "Failed to remove vote", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.get("/api/voting/votes/:sessionId", async (req, res) => {
+    try {
+      const sessionId = parseInt(req.params.sessionId);
+      const votes = await storage.getVotesBySession(sessionId);
+      res.json(votes);
+    } catch (error) {
+      console.error("Get votes error:", error);
+      res.status(500).json({ message: "Failed to get votes", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -7,13 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Upload, Plus, Vote, Download, X } from "lucide-react";
-import { Project, Theme, Quote } from "@shared/schema";
+import { Project, Theme, Quote, VotingSession as VotingSessionType } from "@shared/schema";
 import { TranscriptModal } from "@/components/TranscriptModal";
 import { queryClient } from "@/lib/queryClient";
 import { EnhancedThemeCard } from "@/components/EnhancedThemeCard";
 import { SprintStatistics } from "@/components/SprintStatistics";
 import { SprintFilters, FilterState } from "@/components/SprintFilters";
 import { ExportModal } from "@/components/ExportModal";
+import { VotingModal } from "@/components/VotingModal";
+import { VotingSession } from "@/components/VotingSession";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
@@ -30,6 +32,8 @@ export default function SprintPage() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [showTranscriptModal, setShowTranscriptModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showVotingModal, setShowVotingModal] = useState(false);
+  const [activeVotingSession, setActiveVotingSession] = useState<VotingSessionType | null>(null);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/project"],
@@ -37,6 +41,12 @@ export default function SprintPage() {
 
   const { data: themes = [], refetch: refetchThemes } = useQuery<Theme[]>({
     queryKey: ["/api/themes"],
+  });
+
+  const { data: activeSession } = useQuery<VotingSessionType | null>({
+    queryKey: ['/api/voting/sessions/1/active'],
+    enabled: currentStep === 'insights',
+    refetchInterval: 5000, // Poll every 5s for real-time updates
   });
 
   const synthesizeMutation = useMutation({
@@ -160,6 +170,17 @@ export default function SprintPage() {
         {/* Statistics Overview */}
         <SprintStatistics themes={themes} processingTime={processingTime} />
         
+        {/* Active Voting Session */}
+        {activeSession?.isActive && (
+          <VotingSession
+            session={activeSession}
+            onSessionEnd={() => {
+              setActiveVotingSession(null);
+              queryClient.invalidateQueries({ queryKey: ['/api/voting/sessions/1/active'] });
+            }}
+          />
+        )}
+
         {/* Filters */}
         <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
         
@@ -275,6 +296,17 @@ export default function SprintPage() {
           transcriptType={transcriptType}
           sprintGoal={sprintGoal}
         />
+        
+        {/* Voting Modal */}
+        <VotingModal
+          isOpen={showVotingModal}
+          onOpenChange={setShowVotingModal}
+          projectId={1}
+          onSessionCreated={(session) => {
+            setActiveVotingSession(session);
+            queryClient.invalidateQueries({ queryKey: ['/api/voting/sessions/1/active'] });
+          }}
+        />
       </div>
     );
   };
@@ -295,9 +327,15 @@ export default function SprintPage() {
           
           {currentStep === 'insights' && (
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full sm:w-auto"
+                onClick={() => setShowVotingModal(true)}
+                disabled={!!activeSession?.isActive}
+              >
                 <Vote className="w-4 h-4 mr-2" />
-                Start Voting
+                {activeSession?.isActive ? 'Voting Active' : 'Start Voting'}
               </Button>
               <Button 
                 variant="outline" 

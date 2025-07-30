@@ -53,6 +53,27 @@ export const analysisSettings = pgTable("analysis_settings", {
   themeCount: text("theme_count").default("5-7").notNull(),
 });
 
+export const votingSessions = pgTable("voting_sessions", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull(),
+  name: text("name").notNull(),
+  duration: integer("duration").notNull(), // in minutes
+  isActive: boolean("is_active").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  startsAt: timestamp("starts_at"),
+  endsAt: timestamp("ends_at"),
+});
+
+export const votes = pgTable("votes", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").notNull(),
+  themeId: integer("theme_id").notNull(),
+  itemType: text("item_type").notNull(), // 'theme', 'hmw', 'ai_step'
+  itemIndex: integer("item_index"), // for hmw questions and ai steps
+  voterToken: text("voter_token").notNull(), // anonymous token
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Types
 export interface Quote {
   text: string;
@@ -105,6 +126,16 @@ export const insertAnalysisSettingsSchema = createInsertSchema(analysisSettings)
   id: true,
 });
 
+export const insertVotingSessionSchema = createInsertSchema(votingSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVoteSchema = createInsertSchema(votes).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const fileUploadSchema = z.object({
   filename: z.string(),
   content: z.string(),
@@ -152,3 +183,5 @@ export type Project = typeof projects.$inferSelect;
 export type Transcript = typeof transcripts.$inferSelect;
 export type Theme = typeof themes.$inferSelect;
 export type AnalysisSettings = typeof analysisSettings.$inferSelect;
+export type VotingSession = typeof votingSessions.$inferSelect;
+export type Vote = typeof votes.$inferSelect;
