@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Users, Share2, Play, Loader2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+
 import { useToast } from "@/hooks/use-toast";
 
 interface VotingModalProps {
@@ -34,14 +34,23 @@ export function VotingModal({ isOpen, onOpenChange, projectId, onSessionCreated 
 
     setIsCreating(true);
     try {
-      const session = await apiRequest('/api/voting/sessions', {
+      const response = await fetch('/api/voting/sessions', {
         method: 'POST',
-        body: {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           projectId,
           name: sessionName,
           duration: parseInt(duration),
-        },
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to create voting session');
+      }
+
+      const session = await response.json();
 
       toast({
         title: "Voting session created",
@@ -55,9 +64,10 @@ export function VotingModal({ isOpen, onOpenChange, projectId, onSessionCreated 
       setSessionName("");
       setDuration("15");
     } catch (error) {
+      console.error('Create session error:', error);
       toast({
         title: "Failed to create session",
-        description: "Please try again",
+        description: error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
       });
     } finally {

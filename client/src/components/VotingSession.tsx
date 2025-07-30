@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, Share2, Square, CheckSquare, StopCircle } from "lucide-react";
 import { VotingSession as VotingSessionType } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
+
 import { useToast } from "@/hooks/use-toast";
 
 interface VotingSessionProps {
@@ -49,9 +49,16 @@ export function VotingSession({ session, onSessionEnd }: VotingSessionProps) {
   const handleEndSession = async () => {
     setIsEnding(true);
     try {
-      await apiRequest(`/api/voting/sessions/${session.id}/end`, {
+      const response = await fetch(`/api/voting/sessions/${session.id}/end`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to end session');
+      }
 
       toast({
         title: "Voting session ended",
@@ -60,9 +67,10 @@ export function VotingSession({ session, onSessionEnd }: VotingSessionProps) {
 
       onSessionEnd();
     } catch (error) {
+      console.error('End session error:', error);
       toast({
         title: "Failed to end session",
-        description: "Please try again",
+        description: error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
       });
     } finally {
