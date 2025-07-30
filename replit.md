@@ -24,7 +24,7 @@ Preferred communication style: Simple, everyday language.
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
 - **Database Provider**: Neon Database (serverless PostgreSQL)
 - **File Processing**: Multer for file uploads with in-memory storage
-- **AI Integration**: Claude Sonnet 4.0 (Anthropic) for theme extraction and Sprint insight analysis
+- **AI Integration**: Claude Haiku (Anthropic) for cost-effective theme extraction and Sprint insight analysis
 
 ### Key Components
 
@@ -100,7 +100,7 @@ Preferred communication style: Simple, everyday language.
 - **Transcript Type Selection**: Radio button selection for Expert Interviews vs Testing Notes
 - **HMW Question Generation**: Automatic "How Might We" question creation for each insight
 - **File Upload Integration**: Working file upload functionality with hidden input and upload button
-- **Real AI Integration**: Replaced sample data with Claude Sonnet 4.0 for authentic analysis
+- **Real AI Integration**: Replaced sample data with Claude Haiku for cost-effective authentic analysis
 - **Customizable AI Prompts**: Multiple prompt templates optimized for expert interviews vs user testing
 - **Complete Voting System**: Full voting workflow with persistent results and export integration
 
