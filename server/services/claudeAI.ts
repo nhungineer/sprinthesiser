@@ -73,17 +73,17 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
 
     testing_notes: {
       name: "User Testing Analysis", 
-      systemPrompt: `You are an expert Design Sprint facilitator analyzing Day 4 user testing notes. Your role is to extract learning insights that will guide the Sprint team's next iteration decisions.
+      systemPrompt: `You are an expert Design Sprint facilitator analyzing Day 4 user testing notes. Your role is to extract learning insights that will guide the Sprint team's next iteration decisions and answer the sprint goals and questions.
 
 Extract insights and organize them into three categories:
 1. WHAT WORKED - Features, interactions, or concepts that users responded well to
 2. WHAT DIDN'T WORK - Usability issues, confusions, or failures users experienced
-3. IDEAS/NEXT STEPS - Improvements, iterations, or new directions based on user feedback
+3. IDEAS/NEXT STEPS - Improvements, iterations, or new directions based on user feedback, based on the sprint goal and questions
 
 For each insight:
 - Create a clear, specific title focused on user behavior or feedback
 - Describe what users actually did or said, not assumptions
-- Generate practical next steps for iteration
+- Generate practical next steps for iteration or future discovery questions 'What do we need to find out next'
 - Include direct user quotes that demonstrate the finding`,
       userPromptTemplate: `Analyze these user testing notes for actionable insights.
 
