@@ -739,23 +739,32 @@ export default function SprintPage() {
           {currentStep === 'insights' ? (
             renderInsightCategories()
           ) : (
-            <div className="flex-1 flex items-center justify-center p-6">
-              <div className="text-center gradient-card p-12 rounded-3xl max-w-2xl">
+            <div className="flex-1 flex flex-col p-6">
+              <div className="text-center gradient-card p-8 rounded-3xl w-full mb-8">
+                <p className="text-lg lg:text-xl mb-3 text-gray-900 font-jakarta font-medium">Ready to analyse your transcript</p>
+                <p className="text-sm lg:text-base text-gray-600">Add your sprint context and paste transcript content to get started</p>
+                <p className="text-xs text-gray-500 mt-4 font-jakarta">Your insights will be organised into visual categories like a real sprint wall</p>
+              </div>
+              
+              <div className="flex-1 gradient-card p-8 rounded-3xl relative overflow-hidden">
                 {/* Illustration of sprint insights wall */}
-                <div className="mb-8 relative">
-                  <div className="grid grid-cols-8 gap-2 opacity-90">
+                <div className="relative h-full">
+                  <div className="grid grid-cols-8 gap-4 h-full opacity-90">
                     {/* Opportunities Column */}
-                    <div className="col-span-3 space-y-2">
-                      <div className="h-2 bg-green-500 rounded-full mb-2"></div>
-                      {Array.from({length: 6}, (_, i) => (
+                    <div className="col-span-3 space-y-3 h-full">
+                      <div className="h-8 bg-green-600 rounded-xl mb-4 flex items-center justify-center">
+                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Comic Neue, cursive'}}>Opportunities</span>
+                      </div>
+                      {Array.from({length: 7}, (_, i) => (
                         <div key={`opp-${i}`} 
-                             className={`h-16 rounded-lg empty-state-card ${i % 2 ? 'rotate-1' : '-rotate-1'} ${
+                             className={`h-20 rounded-lg empty-state-card ${i % 2 ? 'rotate-1' : '-rotate-1'} ${
                                i === 0 ? 'bg-green-200' : 
                                i === 1 ? 'bg-lime-200' : 
                                i === 2 ? 'bg-green-300' :
                                i === 3 ? 'bg-emerald-200' :
                                i === 4 ? 'bg-green-100' :
-                               'bg-lime-100'
+                               i === 5 ? 'bg-lime-100' :
+                               'bg-green-250'
                              } border border-green-300/30 shadow-sm`}
                              style={{'--rotation': `${i % 2 ? '1deg' : '-1deg'}`} as React.CSSProperties}>
                         </div>
@@ -763,15 +772,18 @@ export default function SprintPage() {
                     </div>
                     
                     {/* Pain Points Column */}
-                    <div className="col-span-2 space-y-2">
-                      <div className="h-2 bg-red-500 rounded-full mb-2"></div>
-                      {Array.from({length: 4}, (_, i) => (
+                    <div className="col-span-2 space-y-3 h-full">
+                      <div className="h-8 bg-red-600 rounded-xl mb-4 flex items-center justify-center">
+                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Comic Neue, cursive'}}>Pain Points</span>
+                      </div>
+                      {Array.from({length: 5}, (_, i) => (
                         <div key={`pain-${i}`} 
-                             className={`h-16 rounded-lg empty-state-card ${i % 2 ? '-rotate-2' : 'rotate-2'} ${
+                             className={`h-20 rounded-lg empty-state-card ${i % 2 ? '-rotate-2' : 'rotate-2'} ${
                                i === 0 ? 'bg-red-200' : 
                                i === 1 ? 'bg-pink-200' : 
                                i === 2 ? 'bg-red-100' :
-                               'bg-rose-200'
+                               i === 3 ? 'bg-rose-200' :
+                               'bg-red-150'
                              } border border-red-300/30 shadow-sm`}
                              style={{'--rotation': `${i % 2 ? '-2deg' : '2deg'}`} as React.CSSProperties}>
                         </div>
@@ -779,16 +791,19 @@ export default function SprintPage() {
                     </div>
                     
                     {/* Ideas/HMWs Column */}
-                    <div className="col-span-3 space-y-2">
-                      <div className="h-2 bg-yellow-500 rounded-full mb-2"></div>
-                      {Array.from({length: 5}, (_, i) => (
+                    <div className="col-span-3 space-y-3 h-full">
+                      <div className="h-8 bg-yellow-600 rounded-xl mb-4 flex items-center justify-center">
+                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Comic Neue, cursive'}}>Ideas/HMWs</span>
+                      </div>
+                      {Array.from({length: 6}, (_, i) => (
                         <div key={`idea-${i}`} 
-                             className={`h-16 rounded-lg empty-state-card ${i % 2 ? 'rotate-1' : '-rotate-1'} ${
+                             className={`h-20 rounded-lg empty-state-card ${i % 2 ? 'rotate-1' : '-rotate-1'} ${
                                i === 0 ? 'bg-yellow-200' : 
                                i === 1 ? 'bg-amber-200' : 
                                i === 2 ? 'bg-yellow-100' :
                                i === 3 ? 'bg-amber-100' :
-                               'bg-yellow-300'
+                               i === 4 ? 'bg-yellow-300' :
+                               'bg-yellow-150'
                              } border border-yellow-300/30 shadow-sm`}
                              style={{'--rotation': `${i % 2 ? '1deg' : '-1deg'}`} as React.CSSProperties}>
                         </div>
@@ -798,16 +813,16 @@ export default function SprintPage() {
                   
                   {/* Floating elements for depth */}
                   <div className="absolute -top-2 left-8 w-8 h-8 bg-blue-200 rounded-lg transform rotate-12 opacity-60 shadow-sm border border-blue-300/30"></div>
-                  <div className="absolute top-4 right-4 w-6 h-6 bg-purple-200 rounded-lg transform -rotate-6 opacity-70 shadow-sm border border-purple-300/30"></div>
-                  <div className="absolute bottom-2 left-1/3 w-10 h-10 bg-orange-200 rounded-lg transform rotate-6 opacity-50 shadow-sm border border-orange-300/30"></div>
+                  <div className="absolute top-8 right-4 w-6 h-6 bg-purple-200 rounded-lg transform -rotate-6 opacity-70 shadow-sm border border-purple-300/30"></div>
+                  <div className="absolute bottom-8 left-1/3 w-10 h-10 bg-orange-200 rounded-lg transform rotate-6 opacity-50 shadow-sm border border-orange-300/30"></div>
                 </div>
                 
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl gradient-button flex items-center justify-center">
-                  <div className="w-8 h-8 bg-yellow-400 rounded-lg transform rotate-12"></div>
+                {/* Logo at bottom */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                  <div className="w-12 h-12 rounded-2xl gradient-button flex items-center justify-center">
+                    <div className="w-6 h-6 bg-yellow-400 rounded-lg transform rotate-12"></div>
+                  </div>
                 </div>
-                <p className="text-lg lg:text-xl mb-3 text-gray-900 font-jakarta font-medium">Ready to analyse your transcript</p>
-                <p className="text-sm lg:text-base text-gray-600">Add your sprint context and paste transcript content to get started</p>
-                <p className="text-xs text-gray-500 mt-4 font-jakarta">Your insights will be organized into visual categories like a real sprint wall</p>
               </div>
             </div>
           )}
