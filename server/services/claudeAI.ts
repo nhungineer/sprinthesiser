@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic from "@anthropic-ai/sdk";
 import { Quote } from "@shared/schema";
 
 /*
@@ -17,7 +17,7 @@ export interface SprintTheme {
   title: string;
   description?: string;
   quotes: Quote[];
-  category: 'opportunities' | 'pain_points' | 'ideas_hmws' | 'generic';
+  category: "opportunities" | "pain_points" | "ideas_hmws" | "generic";
   hmwQuestions?: string[];
   aiSuggestedSteps?: string[];
   color: string;
@@ -32,23 +32,26 @@ export interface AIPromptTemplate {
 
 export class ClaudeSprintAI {
   // Customizable prompt templates for different Sprint contexts
-  private static readonly PROMPT_TEMPLATES: { [key: string]: AIPromptTemplate } = {
+  private static readonly PROMPT_TEMPLATES: {
+    [key: string]: AIPromptTemplate;
+  } = {
     expert_interviews: {
       name: "Expert Interviews Analysis",
-      systemPrompt: `You are an expert Design Sprint facilitator analyzing Day 2 expert interview transcripts. Your role is to extract actionable insights that will inform the Sprint team's decisions.
+      systemPrompt: `You are an expert Design Sprint facilitator analysing Day 2 expert interview transcripts. Your role is to extract actionable insights that will inform the Sprint team's decisions.
 
-Extract insights and organize them into three categories:
-1. OPPORTUNITIES - Market gaps, user needs, business opportunities the experts identified
-2. PAIN POINTS - Problems, barriers, challenges experts highlighted 
-3. IDEAS/HMWS - Innovative solutions and "How Might We" questions inspired by expert insights
+Extract insights and organise them into three categories:
+1. OPPORTUNITIES - Market gaps, user needs, business opportunities the experts highlighted
+2. PAIN POINTS - Problems, barriers, challenges experts identified 
+3. MISC/OBSERVATIONS - Other observations, behaviours, patterns or ideas that don't fit into the above categories
+
+Reference the sprint goal and questions to focus on relevant insights.
 
 For each insight:
-- Create a clear, actionable title (3-6 words)
-- Write a detailed description explaining the insight's significance
-- Generate 2-3 "How Might We" questions that could lead to solutions
-- Suggest 2-3 concrete next steps or recommendations
-- Include verbatim quotes that support this insight`,
-      userPromptTemplate: `Analyze these expert interview transcripts for Sprint insights.
+- Create a clear, actionable title that summarise the key idea (3-6 words)
+- Provide a description explaining the insight's significance (10-25 words)
+- Generate 2-3 "How Might We" questions focused on framing the problems to solve, or leverage opportunities rather than proposing specic solutions
+- Include verbatim quotes that support this insight, do not make things up`,
+      userPromptTemplate: `Analyse these expert interview transcripts for Sprint insights.
 
 Sprint Goal: {{sprintGoal}}
 Interview Context: Day 2 Expert Interviews - Industry experts sharing knowledge and insights
@@ -61,18 +64,18 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
     {
       "title": "Brief insight title",
       "description": "Detailed description explaining why this matters for the Sprint", 
-      "category": "opportunities|pain_points|ideas_hmws",
+      "category": "opportunities|pain_points|miscellaneous",
       "hmwQuestions": ["How might we leverage this opportunity?", "How might we solve this problem?"],
-      "aiSuggestedSteps": ["Research competitor approaches", "Interview target users about this"],
       "quotes": [{"text": "exact quote from transcript", "source": "Expert Name or Interview #", "transcriptId": 1}]
     }
   ]
 }`,
-      description: "Optimized for analyzing expert knowledge and industry insights from Day 2 interviews"
+      description:
+        "Optimized for analyzing expert knowledge and industry insights from Day 2 interviews",
     },
 
     testing_notes: {
-      name: "User Testing Analysis", 
+      name: "User Testing Analysis",
       systemPrompt: `You are an expert Design Sprint facilitator analyzing Day 4 user testing notes. Your role is to extract learning insights that will guide the Sprint team's next iteration decisions and answer the sprint goals and questions.
 
 Extract insights and organize them into three categories:
@@ -105,7 +108,8 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
     }
   ]
 }`,
-      description: "Optimized for analyzing user testing sessions and prototype feedback"
+      description:
+        "Optimized for analyzing user testing sessions and prototype feedback",
     },
 
     general_research: {
@@ -138,86 +142,100 @@ Return JSON with this exact structure:
     }
   ]
 }`,
-      description: "General purpose analysis for various types of research content"
-    }
+      description:
+        "General purpose analysis for various types of research content",
+    },
   };
 
   static async extractSprintInsights(
     transcriptContent: string,
-    transcriptType: 'expert_interviews' | 'testing_notes' = 'expert_interviews',
+    transcriptType: "expert_interviews" | "testing_notes" = "expert_interviews",
     sprintGoal?: string,
-    customTemplate?: string
+    customTemplate?: string,
   ): Promise<SprintTheme[]> {
     try {
       if (!process.env.ANTHROPIC_API_KEY) {
-        throw new Error("Anthropic API key not configured. Please add your ANTHROPIC_API_KEY to environment variables.");
+        throw new Error(
+          "Anthropic API key not configured. Please add your ANTHROPIC_API_KEY to environment variables.",
+        );
       }
 
       // Select prompt template based on transcript type
       const template = customTemplate || transcriptType;
-      const promptConfig = this.PROMPT_TEMPLATES[template] || this.PROMPT_TEMPLATES.general_research;
+      const promptConfig =
+        this.PROMPT_TEMPLATES[template] ||
+        this.PROMPT_TEMPLATES.general_research;
 
       // Build the user prompt by replacing template variables
       const userPrompt = promptConfig.userPromptTemplate
-        .replace('{{sprintGoal}}', sprintGoal || 'Not specified')
-        .replace('{{transcriptContent}}', transcriptContent)
-        .replace('{{transcriptType}}', transcriptType);
+        .replace("{{sprintGoal}}", sprintGoal || "Not specified")
+        .replace("{{transcriptContent}}", transcriptContent)
+        .replace("{{transcriptType}}", transcriptType);
 
       const response = await anthropic.messages.create({
         max_tokens: 4000,
         messages: [
-          { 
-            role: 'user', 
-            content: `${promptConfig.systemPrompt}\n\n${userPrompt}` 
-          }
+          {
+            role: "user",
+            content: `${promptConfig.systemPrompt}\n\n${userPrompt}`,
+          },
         ],
         // Using Claude Haiku for cost-effective analysis
         model: DEFAULT_MODEL_STR,
       });
 
-      const textContent = response.content.find(block => block.type === 'text');
-      if (!textContent || textContent.type !== 'text') {
-        throw new Error('No text content received from Claude');
+      const textContent = response.content.find(
+        (block) => block.type === "text",
+      );
+      if (!textContent || textContent.type !== "text") {
+        throw new Error("No text content received from Claude");
       }
-      
+
       // Extract and clean JSON response
       let jsonStr = textContent.text || '{"themes": []}';
-      
+
       // Try to extract from code blocks first
-      const jsonMatch = jsonStr.match(/```json\n([\s\S]*?)\n```/) || 
-                       jsonStr.match(/```\n([\s\S]*?)\n```/);
-      
+      const jsonMatch =
+        jsonStr.match(/```json\n([\s\S]*?)\n```/) ||
+        jsonStr.match(/```\n([\s\S]*?)\n```/);
+
       if (jsonMatch) {
         jsonStr = jsonMatch[1];
       }
-      
+
       // Clean up common JSON formatting issues
-      jsonStr = jsonStr.trim()
-        .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+      jsonStr = jsonStr
+        .trim()
+        .replace(/,(\s*[}\]])/g, "$1") // Remove trailing commas
         .replace(/([{\[,]\s*)(\w+):/g, '$1"$2":') // Quote unquoted keys
         .replace(/:\s*'([^']*)'/g, ': "$1"') // Replace single quotes with double quotes
-        .replace(/\n\s*\n/g, '\n'); // Remove empty lines
-      
+        .replace(/\n\s*\n/g, "\n"); // Remove empty lines
+
       let result;
       try {
         result = JSON.parse(jsonStr);
       } catch (parseError) {
-        console.error('JSON Parse Error:', parseError);
-        console.error('Raw response:', textContent.text.substring(0, 500) + '...');
-        console.error('Cleaned JSON:', jsonStr.substring(0, 500) + '...');
-        
+        console.error("JSON Parse Error:", parseError);
+        console.error(
+          "Raw response:",
+          textContent.text.substring(0, 500) + "...",
+        );
+        console.error("Cleaned JSON:", jsonStr.substring(0, 500) + "...");
+
         // Fallback: return empty structure if JSON parsing fails
         result = { themes: [] };
       }
-      
-      return result.themes?.map((theme: any) => ({
-        ...theme,
-        color: this.getCategoryColor(theme.category),
-      })) || [];
 
+      return (
+        result.themes?.map((theme: any) => ({
+          ...theme,
+          color: this.getCategoryColor(theme.category),
+        })) || []
+      );
     } catch (error) {
       console.error("Claude AI extraction error:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       throw new Error(`AI analysis failed: ${errorMessage}`);
     }
   }
@@ -234,40 +252,47 @@ Return JSON with this exact structure:
 
   // Generate a custom prompt based on user preferences
   static createCustomPrompt(
-    focusAreas: string[], 
+    focusAreas: string[],
     outputFormat: string,
-    analysisDepth: 'basic' | 'detailed' | 'comprehensive' = 'detailed'
+    analysisDepth: "basic" | "detailed" | "comprehensive" = "detailed",
   ): AIPromptTemplate {
     const depthInstructions = {
       basic: "Provide concise, high-level insights with minimal detail.",
-      detailed: "Provide thorough analysis with clear explanations and context.",
-      comprehensive: "Provide in-depth analysis with extensive detail, multiple perspectives, and strategic implications."
+      detailed:
+        "Provide thorough analysis with clear explanations and context.",
+      comprehensive:
+        "Provide in-depth analysis with extensive detail, multiple perspectives, and strategic implications.",
     };
 
     return {
       name: "Custom Analysis",
-      systemPrompt: `You are an expert researcher analyzing qualitative data. Focus specifically on: ${focusAreas.join(', ')}. 
+      systemPrompt: `You are an expert researcher analyzing qualitative data. Focus specifically on: ${focusAreas.join(", ")}. 
       
 Analysis depth: ${depthInstructions[analysisDepth]}
       
 Extract insights and organize them appropriately based on the content type and research goals.`,
-      userPromptTemplate: `Analyze this content with focus on: ${focusAreas.join(', ')}
+      userPromptTemplate: `Analyze this content with focus on: ${focusAreas.join(", ")}
 
 Research Goal: {{sprintGoal}}
 Content: {{transcriptContent}}
 
 ${outputFormat}`,
-      description: `Custom analysis focusing on: ${focusAreas.join(', ')}`
+      description: `Custom analysis focusing on: ${focusAreas.join(", ")}`,
     };
   }
 
   private static getCategoryColor(category: string): string {
     switch (category) {
-      case 'opportunities': return '#22c55e'; // green
-      case 'pain_points': return '#ef4444';   // red
-      case 'ideas_hmws': return '#eab308';    // yellow
-      case 'generic': return '#6b7280';       // gray
-      default: return '#6b7280';
+      case "opportunities":
+        return "#22c55e"; // green
+      case "pain_points":
+        return "#ef4444"; // red
+      case "ideas_hmws":
+        return "#eab308"; // yellow
+      case "generic":
+        return "#6b7280"; // gray
+      default:
+        return "#6b7280";
     }
   }
 }
