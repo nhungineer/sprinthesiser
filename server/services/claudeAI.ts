@@ -17,7 +17,7 @@ export interface SprintTheme {
   title: string;
   description?: string;
   quotes: Quote[];
-  category: "opportunities" | "pain_points" | "ideas_hmws" | "generic";
+  category: "opportunities" | "pain_points" | "miscellaneous" | "generic";
   hmwQuestions?: string[];
   aiSuggestedSteps?: string[];
   color: string;
@@ -65,6 +65,7 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
       "title": "Brief insight title",
       "description": "Detailed description explaining why this matters for the Sprint", 
       "category": "opportunities|pain_points|miscellaneous",
+      "aiSuggestedSteps": ["Research competitor approaches", "Interview target users about this"],
       "hmwQuestions": ["How might we leverage this opportunity?", "How might we solve this problem?"],
       "quotes": [{"text": "exact quote from transcript", "source": "Expert Name or Interview #", "transcriptId": 1}]
     }

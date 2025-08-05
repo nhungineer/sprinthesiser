@@ -308,7 +308,7 @@ export default function SprintPage() {
     const filteredThemes = filterThemes(themes);
     const opportunities = filteredThemes.filter(t => t.category === 'opportunities');
     const painPoints = filteredThemes.filter(t => t.category === 'pain_points');
-    const ideasHmws = filteredThemes.filter(t => t.category === 'ideas_hmws');
+    const ideasHmws = filteredThemes.filter(t => t.category === 'miscellaneous');
     const generic = filteredThemes.filter(t => t.category === 'generic');
 
     return (
@@ -422,7 +422,7 @@ export default function SprintPage() {
           {/* Ideas/HMWs */}
           <div className="space-y-4">
             <div className="bg-yellow-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
-              <span>{transcriptType === 'expert_interviews' ? 'IDEAS' : 'IDEAS/NEXT STEPS'}</span>
+              <span>{transcriptType === 'expert_interviews' ? 'MISC/OBSERVATIONS' : 'IDEAS/NEXT STEPS'}</span>
               <span className="bg-yellow-700 px-2 py-1 rounded text-xs">{ideasHmws.length}</span>
             </div>
             <div className="space-y-3">
@@ -441,7 +441,7 @@ export default function SprintPage() {
               ))}
               {ideasHmws.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
-                  <p className="text-sm">No ideas found</p>
+                  <p className="text-sm">No misc/observations found</p>
                 </div>
               )}
             </div>

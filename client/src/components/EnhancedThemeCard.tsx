@@ -44,7 +44,7 @@ export function EnhancedThemeCard({
           return { color: 'bg-red-100 border-red-300', textColor: 'text-red-900' };
         case 'opportunities':
           return { color: 'bg-green-100 border-green-300', textColor: 'text-green-900' };
-        case 'ideas_hmws':
+        case 'miscellaneous':
           return { color: 'bg-yellow-100 border-yellow-300', textColor: 'text-yellow-900' };
         default:
           return { color: 'bg-blue-100 border-blue-300', textColor: 'text-blue-900' };
