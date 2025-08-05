@@ -1,28 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
+  --background: hsl(240, 10%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 5%, 10%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 8%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 8%, 6%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 8%, 15%);
+  --input: hsl(240, 8%, 12%);
+  --primary: hsl(262, 83%, 58%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(240, 5%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 5%, 15%);
+  --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
-  --radius: 0.5rem;
+  --ring: hsl(262, 83%, 58%);
+  --radius: 1rem;
   
   /* Theme colors for post-it notes */
   --theme-red: hsl(0, 84%, 60%);
@@ -63,14 +65,41 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    @apply font-sans antialiased text-foreground;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, hsl(240, 10%, 4%) 0%, hsl(250, 15%, 8%) 50%, hsl(260, 20%, 6%) 100%);
+    min-height: 100vh;
   }
 }
 
 @layer utilities {
-  .font-inter {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  .font-jakarta {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+  
+  .gradient-card {
+    background: linear-gradient(135deg, hsl(240, 8%, 8%) 0%, hsl(245, 10%, 12%) 100%);
+    border: 1px solid hsl(240, 8%, 18%);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  }
+  
+  .gradient-button {
+    background: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(275, 85%, 65%) 100%);
+    border: none;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+    transition: all 0.2s ease;
+  }
+  
+  .gradient-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  }
+  
+  .insight-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
   
   /* Theme colors */

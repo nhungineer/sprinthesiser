@@ -612,27 +612,29 @@ export default function SprintPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 lg:p-6">
+    <div className="min-h-screen p-4 lg:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 lg:mb-8 gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-400 rounded-sm"></div>
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center gradient-button">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 bg-yellow-400 rounded-lg transform rotate-12"></div>
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Sprint-thesiser</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold font-jakarta bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                Sprinthesiser
+              </h1>
+              <p className="text-sm text-gray-400 mt-1">AI-powered Design Sprint synthesis</p>
             </div>
           </div>
           
 
           
           {currentStep === 'insights' && (
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
               <Button 
-                variant="outline" 
                 size="sm" 
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto gradient-button text-white font-medium rounded-xl"
                 onClick={() => setShowVotingModal(true)}
                 disabled={!!activeSession?.isActive}
               >
@@ -642,7 +644,7 @@ export default function SprintPage() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto border-border/50 text-gray-300 hover:text-white rounded-xl font-medium"
                 onClick={() => setShowExportModal(true)}
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -658,37 +660,36 @@ export default function SprintPage() {
             {(currentStep === 'context' || currentStep === 'transcript') && (
               <Button
                 onClick={loadDemoData}
-                variant="outline"
                 size="sm"
-                className="flex items-center space-x-2 w-full"
+                className="flex items-center space-x-2 w-full gradient-button text-white font-medium rounded-xl"
               >
                 <Plus className="w-4 h-4" />
                 <span>Load Demo Data</span>
               </Button>
             )}
             
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-3">Sprint goals</h3>
+            <div className="gradient-card p-6 rounded-2xl">
+              <h3 className="font-semibold text-white mb-4 font-jakarta">Sprint Goals</h3>
               <Textarea
                 placeholder="What is your sprint trying to solve?"
                 value={sprintGoal}
                 onChange={(e) => setSprintGoal(e.target.value)}
-                className="mb-3 min-h-[100px]"
+                className="mb-4 min-h-[100px] bg-background/50 border-border/50 text-white placeholder:text-gray-400 rounded-xl focus:ring-2 focus:ring-primary/50"
               />
               <div className="mt-4">
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Context</Label>
+                <Label className="text-sm font-medium text-gray-300 mb-3 block font-jakarta">Context</Label>
                 <Textarea
                   placeholder="Add sprint hypotheses or context (use bullet points)..."
                   value={contextContent}
                   onChange={(e) => setContextContent(e.target.value)}
-                  className="min-h-[120px]"
+                  className="min-h-[120px] bg-background/50 border-border/50 text-white placeholder:text-gray-400 rounded-xl focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-800">Transcript</h3>
+            <div className="gradient-card p-6 rounded-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white font-jakarta">Transcript</h3>
                 <div className="flex items-center gap-2">
                   <AIPromptSettings transcriptType={transcriptType} />
                   <Button variant="ghost" size="sm" className="p-1" onClick={() => document.getElementById('file-upload')?.click()}>
@@ -722,11 +723,11 @@ export default function SprintPage() {
                 placeholder="Paste your transcript here to extract insights"
                 value={transcriptContent}
                 onChange={(e) => setTranscriptContent(e.target.value)}
-                className="min-h-[250px] mb-4"
+                className="min-h-[250px] mb-6 bg-background/50 border-border/50 text-white placeholder:text-gray-400 rounded-xl focus:ring-2 focus:ring-primary/50"
               />
               <Button 
                 onClick={handleSynthesize}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full gradient-button text-white font-semibold rounded-xl h-12 text-lg font-jakarta"
                 disabled={!transcriptContent.trim() || isAnalyzing}
               >
                 {isAnalyzing ? 'ANALYSING...' : 'SYNTHESISE'}
@@ -739,9 +740,12 @@ export default function SprintPage() {
             renderInsightCategories()
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">
-              <div className="text-center text-gray-500">
-                <p className="text-base lg:text-lg mb-2">Ready to analyse your transcript</p>
-                <p className="text-sm lg:text-base">Add your sprint context and paste transcript content to get started</p>
+              <div className="text-center gradient-card p-12 rounded-3xl">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl gradient-button flex items-center justify-center">
+                  <div className="w-8 h-8 bg-yellow-400 rounded-lg transform rotate-12"></div>
+                </div>
+                <p className="text-lg lg:text-xl mb-3 text-white font-jakarta font-medium">Ready to analyse your transcript</p>
+                <p className="text-sm lg:text-base text-gray-400">Add your sprint context and paste transcript content to get started</p>
               </div>
             </div>
           )}
