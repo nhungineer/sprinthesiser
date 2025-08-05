@@ -170,8 +170,7 @@ export function EnhancedThemeCard({
         </div>
 
         {/* AI Content - Show on hover or always during voting */}
-        {(isHovered || activeVotingSession?.isActive) && (
-          <div className="space-y-3" data-hover-content>
+        <div className="space-y-3">
             {/* Combined AI Suggestions */}
             {((theme.hmwQuestions && theme.hmwQuestions.length > 0) || (theme.aiSuggestedSteps && theme.aiSuggestedSteps.length > 0)) && (
               <div className="space-y-2">
@@ -304,8 +303,7 @@ export function EnhancedThemeCard({
                 )}
               </div>
             )}
-          </div>
-        )}
+        </div>
       </Card>
     </TooltipProvider>
   );
