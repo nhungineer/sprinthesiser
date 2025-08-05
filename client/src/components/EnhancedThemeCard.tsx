@@ -68,25 +68,31 @@ export function EnhancedThemeCard({
   const handleCopyStep = async (step: string) => {
     try {
       await navigator.clipboard.writeText(step);
-      // Show temporary feedback
-      const originalText = step.substring(0, 20) + '...';
-      // Create a temporary toast-like element
+      // Show temporary feedback in bottom right corner
       const toastEl = document.createElement('div');
       toastEl.textContent = 'Copied to clipboard!';
-      toastEl.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity';
+      toastEl.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity';
       document.body.appendChild(toastEl);
       setTimeout(() => {
         toastEl.style.opacity = '0';
-        setTimeout(() => document.body.removeChild(toastEl), 300);
+        setTimeout(() => {
+          if (document.body.contains(toastEl)) {
+            document.body.removeChild(toastEl);
+          }
+        }, 300);
       }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
-      // Show error feedback
+      // Show error feedback in bottom right corner
       const toastEl = document.createElement('div');
       toastEl.textContent = 'Failed to copy';
-      toastEl.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50';
+      toastEl.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50';
       document.body.appendChild(toastEl);
-      setTimeout(() => document.body.removeChild(toastEl), 2000);
+      setTimeout(() => {
+        if (document.body.contains(toastEl)) {
+          document.body.removeChild(toastEl);
+        }
+      }, 2000);
     }
   };
 

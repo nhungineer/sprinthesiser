@@ -275,6 +275,56 @@ export default function SprintPage() {
     setShowTranscriptModal(true);
   };
 
+  const loadDemoData = () => {
+    setSprintGoal("Identify pain points and product opportunities in seasonal hay fever management");
+    setContextFields([
+      "Hayfever sufferers prefer a personalised way to interact with pollen allergy recommendations in natural languages and being specific to their context, activities",
+      "Proactive alerts are essential on bad days where the conditions are heading towards a bad day (windy, extreme pollen count etc)",
+      "Existing apps fail because they show generic data that doesn't correlate with personal symptoms. Users abandon apps when they can't see the connection between data and their experience"
+    ]);
+    
+    const demoTranscript = `### Hay fever, allergy background
+
+- Chronic hay fever and allergy sufferer, pretty much happening all year around
+- Had skin test pin prick for different kinds of allergens at primary school: tested for pollen, grass, dust mites, etc and even did 'drops under the tongue' immunotherapy for a couple of months, but nothing really happened. Couldn't remember why they decided to stop the immunotherapy
+- Essentially, 'how do you avoid grass and dust?'
+- Things can get pretty bad in spring
+
+### Hayfever management
+
+- In the last 5 years, just have Telfast non-stop every day
+- If stop taking it, can feel the difference: going outside and have itchy eyes.
+- Also have post-nasal drip, have to do nasal rinse whenever feel clogged up or issues with sinuses
+- Has sensitive sinuses, any changes in environment could set it off eg sitting near the door and has a whiff of cold air
+- Cycling a lot, and in spring, if cycling on a windy day, with visible pollen it can be pretty noticeable
+- Started wearing a mask when cycling before covid, but it could get annoying: too many things around the ears, helmets and masks.
+- Subscribes to government air quality alerts, mainly about smokes, backburning.
+- Tries to vacuum every week, as allergic to dust mites
+- Thinking about getting an air purifier for the bedroom, as sometimes the air feels skanky when it's been raining a lot, or when it's too windy with pollen outside
+- Has Nasonex, a cortisol nasal spray, hayfever relief and prevention, when feeling really bad in spring, but not using it much
+
+### Reminders
+
+- Trying to do anything daily is hard!'
+- Using MediSafe, an app for daily reminder for Telfast medication but push notification is not enough
+- Also has a bright smart light, shining to her face in the morning as a harsh reminder to take medications before turning it off
+
+### Symptom correlations
+
+- Used AirQuality App before but stopped using as it didn't really correlate to symptoms
+- Had some bad days and looked at the app but all indicators were green
+- Tried to look for specific items that might be different to correlate with symptoms, but couldn't find anything consistently correlated - gave up usage after a couple of months
+- Message other people like her sister on 'bad days' or colleagues with hayfever, to check-in about their symptoms, to not feel crazy, to validate the issues, and try to find correlation or root causes`;
+
+    setTranscriptContent(demoTranscript);
+    setTranscriptType('expert_interviews');
+    
+    toast({
+      title: "Demo Data Loaded",
+      description: "Sprint goal, context, and transcript have been populated with hay fever management example",
+    });
+  };
+
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
   };
@@ -586,6 +636,18 @@ export default function SprintPage() {
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Sprint-thesiser</h1>
             </div>
           </div>
+          
+          {(currentStep === 'context' || currentStep === 'transcript') && (
+            <Button
+              onClick={loadDemoData}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Load Demo Data</span>
+            </Button>
+          )}
           
           {currentStep === 'insights' && (
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
