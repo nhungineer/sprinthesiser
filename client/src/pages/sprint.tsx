@@ -22,7 +22,7 @@ import { AIPromptSettings } from "@/components/AIPromptSettings";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
-  const [contextFields, setContextFields] = useState<string[]>([]);
+  const [contextContent, setContextContent] = useState<string>("");
   const [transcriptContent, setTranscriptContent] = useState("");
   const [transcriptType, setTranscriptType] = useState<'expert_interviews' | 'testing_notes'>('expert_interviews');
   const [currentStep, setCurrentStep] = useState<'context' | 'transcript' | 'insights'>('context');
@@ -191,19 +191,7 @@ export default function SprintPage() {
     setCurrentStep('transcript');
   };
 
-  const addContextField = () => {
-    setContextFields([...contextFields, ""]);
-  };
 
-  const removeContextField = (index: number) => {
-    setContextFields(contextFields.filter((_, i) => i !== index));
-  };
-
-  const updateContextField = (index: number, value: string) => {
-    const updated = [...contextFields];
-    updated[index] = value;
-    setContextFields(updated);
-  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -277,11 +265,11 @@ export default function SprintPage() {
 
   const loadDemoData = () => {
     setSprintGoal("Identify pain points and product opportunities in seasonal hay fever management");
-    setContextFields([
-      "Hayfever sufferers prefer a personalised way to interact with pollen allergy recommendations in natural languages and being specific to their context, activities",
-      "Proactive alerts are essential on bad days where the conditions are heading towards a bad day (windy, extreme pollen count etc)",
-      "Existing apps fail because they show generic data that doesn't correlate with personal symptoms. Users abandon apps when they can't see the connection between data and their experience"
-    ]);
+    setContextContent(`• Hayfever sufferers prefer a personalised way to interact with pollen allergy recommendations in natural languages and being specific to their context, activities
+
+• Proactive alerts are essential on bad days where the conditions are heading towards a bad day (windy, extreme pollen count etc)
+
+• Existing apps fail because they show generic data that doesn't correlate with personal symptoms. Users abandon apps when they can't see the connection between data and their experience`);
     
     const demoTranscript = `### Hay fever, allergy background
 
@@ -687,54 +675,15 @@ export default function SprintPage() {
                 onChange={(e) => setSprintGoal(e.target.value)}
                 className="mb-3 min-h-[100px]"
               />
-              {contextFields.length > 0 && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label className="text-sm font-medium text-gray-700">Context</Label>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={addContextField}
-                      className="h-7 px-2 text-xs"
-                    >
-                      <Plus className="w-3 h-3 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                  <div className="border rounded-md p-3 max-h-40 overflow-y-auto bg-gray-50">
-                    <ul className="space-y-2">
-                      {contextFields.map((field, index) => (
-                        <li key={index} className="flex items-start space-x-2">
-                          <span className="text-gray-600 mt-1 text-sm">•</span>
-                          <div className="flex-1 group">
-                            <Textarea
-                              value={field}
-                              onChange={(e) => updateContextField(index, e.target.value)}
-                              className="min-h-[60px] text-sm bg-white border-gray-200 resize-none"
-                              placeholder="Sprint hypothesis or context..."
-                            />
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => removeContextField(index)}
-                              className="h-5 w-5 p-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="w-3 h-3 text-gray-400" />
-                            </Button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-              
-              {contextFields.length === 0 && (
-                <Button variant="outline" size="sm" onClick={addContextField}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add context
-                </Button>
-              )}
+              <div className="mt-4">
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Context</Label>
+                <Textarea
+                  placeholder="Add sprint hypotheses or context (use bullet points)..."
+                  value={contextContent}
+                  onChange={(e) => setContextContent(e.target.value)}
+                  className="min-h-[120px]"
+                />
+              </div>
             </div>
 
             <div>
