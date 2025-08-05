@@ -138,11 +138,23 @@ export function EnhancedThemeCard({
   };
 
   const VoteButton = ({ itemType, itemIndex }: { itemType: string; itemIndex?: number }) => {
-    if (!activeVotingSession?.isActive) return null;
-    
     const voteCount = getVoteCount(itemType, itemIndex);
     const userVoted = hasUserVoted(itemType, itemIndex);
     
+    // Show vote results even when session is inactive
+    if (!activeVotingSession?.isActive) {
+      // Only show if there are votes to display
+      if (voteCount === 0) return null;
+      
+      return (
+        <div className="flex items-center text-xs text-gray-600">
+          <Heart className="w-3 h-3 mr-1 fill-current text-pink-500" />
+          {voteCount}
+        </div>
+      );
+    }
+    
+    // Interactive voting button during active session
     return (
       <Button
         variant="ghost"
@@ -264,67 +276,69 @@ export function EnhancedThemeCard({
                                 {hmw}
                               </p>
                             </div>
-                            {!activeVotingSession?.isActive && (
-                              <div className="flex items-center justify-between bg-white/30 px-2 py-1 rounded text-xs">
-                                <div className="flex items-center space-x-2">
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleCopyStep(hmw)}
-                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
-                                      >
-                                        <Copy className="w-3 h-3" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Copy</TooltipContent>
-                                  </Tooltip>
-                                  
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setEditingStep(`hmw-${idx}`);
-                                          setEditValue(hmw);
-                                        }}
-                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Edit</TooltipContent>
-                                  </Tooltip>
-                                  
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100 text-red-600"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete HMW Question</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Are you sure you want to delete this "How Might We" question? This action cannot be undone.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDeleteStep(idx, true)}>Delete</AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </div>
-                                <VoteButton itemType="hmw" itemIndex={idx} />
+                            <div className="flex items-center justify-between bg-white/30 px-2 py-1 rounded text-xs">
+                              <div className="flex items-center space-x-2">
+                                {!activeVotingSession?.isActive && (
+                                  <>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => handleCopyStep(hmw)}
+                                          className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+                                        >
+                                          <Copy className="w-3 h-3" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Copy</TooltipContent>
+                                    </Tooltip>
+                                    
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            setEditingStep(`hmw-${idx}`);
+                                            setEditValue(hmw);
+                                          }}
+                                          className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Edit</TooltipContent>
+                                    </Tooltip>
+                                    
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-5 w-5 p-0 opacity-70 hover:opacity-100 text-red-600"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete HMW Question</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete this "How Might We" question? This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction onClick={() => handleDeleteStep(idx, true)}>Delete</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </>
+                                )}
                               </div>
-                            )}
+                              <VoteButton itemType="hmw" itemIndex={idx} />
+                            </div>
                           </>
                         )}
                       </div>
@@ -380,67 +394,69 @@ export function EnhancedThemeCard({
                                 {step}
                               </p>
                             </div>
-                            {!activeVotingSession?.isActive && (
-                              <div className="flex items-center justify-between bg-white/30 px-2 py-1 rounded text-xs">
-                                <div className="flex items-center space-x-2">
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleCopyStep(step)}
-                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
-                                      >
-                                        <Copy className="w-3 h-3" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Copy</TooltipContent>
-                                  </Tooltip>
-                                  
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setEditingStep(idx);
-                                          setEditValue(step);
-                                        }}
-                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Edit</TooltipContent>
-                                  </Tooltip>
-                                  
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100 text-red-600"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete AI Suggested Step</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Are you sure you want to delete this AI suggested step? This action cannot be undone.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDeleteStep(idx, false)}>Delete</AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </div>
-                                <VoteButton itemType="step" itemIndex={idx} />
+                            <div className="flex items-center justify-between bg-white/30 px-2 py-1 rounded text-xs">
+                              <div className="flex items-center space-x-2">
+                                {!activeVotingSession?.isActive && (
+                                  <>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => handleCopyStep(step)}
+                                          className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+                                        >
+                                          <Copy className="w-3 h-3" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Copy</TooltipContent>
+                                    </Tooltip>
+                                    
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            setEditingStep(idx);
+                                            setEditValue(step);
+                                          }}
+                                          className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Edit</TooltipContent>
+                                    </Tooltip>
+                                    
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-5 w-5 p-0 opacity-70 hover:opacity-100 text-red-600"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete AI Suggested Step</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete this AI suggested step? This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction onClick={() => handleDeleteStep(idx, false)}>Delete</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </>
+                                )}
                               </div>
-                            )}
+                              <VoteButton itemType="step" itemIndex={idx} />
+                            </div>
                           </>
                         )}
                       </div>
