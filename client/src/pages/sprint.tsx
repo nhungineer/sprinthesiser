@@ -624,7 +624,7 @@ export default function SprintPage() {
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={!transcriptContent.trim() || isAnalyzing}
               >
-                {isAnalyzing ? 'ANALYZING...' : 'SYNTHESISE'}
+                {isAnalyzing ? 'ANALYSING...' : 'SYNTHESISE'}
               </Button>
             </div>
           </div>
@@ -635,7 +635,7 @@ export default function SprintPage() {
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center text-gray-500">
-                <p className="text-base lg:text-lg mb-2">Ready to analyze your transcript</p>
+                <p className="text-base lg:text-lg mb-2">Ready to analyse your transcript</p>
                 <p className="text-sm lg:text-base">Add your sprint context and paste transcript content to get started</p>
               </div>
             </div>

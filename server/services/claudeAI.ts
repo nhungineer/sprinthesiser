@@ -65,14 +65,13 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
       "title": "Brief insight title",
       "description": "Detailed description explaining why this matters for the Sprint", 
       "category": "opportunities|pain_points|miscellaneous",
-      "aiSuggestedSteps": ["Research competitor approaches", "Interview target users about this"],
       "hmwQuestions": ["How might we leverage this opportunity?", "How might we solve this problem?"],
       "quotes": [{"text": "exact quote from transcript", "source": "Expert Name or Interview #", "transcriptId": 1}]
     }
   ]
 }`,
       description:
-        "Optimized for analyzing expert knowledge and industry insights from Day 2 interviews",
+        "Optimised for analysing expert knowledge and industry insights from Day 2 interviews",
     },
 
     testing_notes: {

@@ -35,7 +35,7 @@ export function EnhancedThemeCard({
   const [editingStep, setEditingStep] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isHovered, setIsHovered] = useState(false);
-  const [hoveredStepIndex, setHoveredStepIndex] = useState<number | null>(null);
+  const [hoveredStepIndex, setHoveredStepIndex] = useState<string | number | null>(null);
 
   const getCategoryConfig = () => {
     if (transcriptType === 'expert_interviews') {
@@ -183,11 +183,30 @@ export function EnhancedThemeCard({
                 {theme.hmwQuestions && theme.hmwQuestions.length > 0 && (
                   <div className="space-y-1">
                     {theme.hmwQuestions.map((hmw, idx) => (
-                      <div key={`hmw-${idx}`} className="flex items-center justify-between bg-white/50 p-2 rounded">
-                        <p className="text-sm text-gray-600 flex-1 mr-2">
-                          {hmw}
-                        </p>
-                        <VoteButton itemType="hmw" itemIndex={idx} />
+                      <div key={`hmw-${idx}`} className="group" onMouseEnter={() => setHoveredStepIndex(`hmw-${idx}`)} onMouseLeave={() => setHoveredStepIndex(null)}>
+                        <div className="flex items-center justify-between bg-white/50 p-2 rounded group-hover:bg-white/70 transition-colors">
+                          <p className="text-sm text-gray-600 flex-1 mr-2">
+                            {hmw}
+                          </p>
+                          <div className="flex items-center space-x-1">
+                            <VoteButton itemType="hmw" itemIndex={idx} />
+                            {hoveredStepIndex === `hmw-${idx}` && !activeVotingSession?.isActive && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleCopyStep(hmw)}
+                                    className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
+                                  >
+                                    <Copy className="w-3 h-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Copy</TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
