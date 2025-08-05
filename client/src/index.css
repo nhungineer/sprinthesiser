@@ -103,6 +103,24 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   }
   
+  /* Empty state animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(var(--rotation)); }
+    50% { transform: translateY(-4px) rotate(var(--rotation)); }
+  }
+  
+  .empty-state-card {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .empty-state-card:nth-child(odd) {
+    animation-delay: -0.5s;
+  }
+  
+  .empty-state-card:nth-child(even) {
+    animation-delay: -1s;
+  }
+  
   /* Theme colors */
   .bg-theme-red { background-color: var(--theme-red); }
   .bg-theme-violet { background-color: var(--theme-violet); }

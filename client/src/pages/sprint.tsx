@@ -740,12 +740,74 @@ export default function SprintPage() {
             renderInsightCategories()
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">
-              <div className="text-center gradient-card p-12 rounded-3xl">
+              <div className="text-center gradient-card p-12 rounded-3xl max-w-2xl">
+                {/* Illustration of sprint insights wall */}
+                <div className="mb-8 relative">
+                  <div className="grid grid-cols-8 gap-2 opacity-90">
+                    {/* Opportunities Column */}
+                    <div className="col-span-3 space-y-2">
+                      <div className="h-2 bg-green-500 rounded-full mb-2"></div>
+                      {Array.from({length: 6}, (_, i) => (
+                        <div key={`opp-${i}`} 
+                             className={`h-16 rounded-lg empty-state-card ${i % 2 ? 'rotate-1' : '-rotate-1'} ${
+                               i === 0 ? 'bg-green-200' : 
+                               i === 1 ? 'bg-lime-200' : 
+                               i === 2 ? 'bg-green-300' :
+                               i === 3 ? 'bg-emerald-200' :
+                               i === 4 ? 'bg-green-100' :
+                               'bg-lime-100'
+                             } border border-green-300/30 shadow-sm`}
+                             style={{'--rotation': `${i % 2 ? '1deg' : '-1deg'}`} as React.CSSProperties}>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Pain Points Column */}
+                    <div className="col-span-2 space-y-2">
+                      <div className="h-2 bg-red-500 rounded-full mb-2"></div>
+                      {Array.from({length: 4}, (_, i) => (
+                        <div key={`pain-${i}`} 
+                             className={`h-16 rounded-lg empty-state-card ${i % 2 ? '-rotate-2' : 'rotate-2'} ${
+                               i === 0 ? 'bg-red-200' : 
+                               i === 1 ? 'bg-pink-200' : 
+                               i === 2 ? 'bg-red-100' :
+                               'bg-rose-200'
+                             } border border-red-300/30 shadow-sm`}
+                             style={{'--rotation': `${i % 2 ? '-2deg' : '2deg'}`} as React.CSSProperties}>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Ideas/HMWs Column */}
+                    <div className="col-span-3 space-y-2">
+                      <div className="h-2 bg-yellow-500 rounded-full mb-2"></div>
+                      {Array.from({length: 5}, (_, i) => (
+                        <div key={`idea-${i}`} 
+                             className={`h-16 rounded-lg empty-state-card ${i % 2 ? 'rotate-1' : '-rotate-1'} ${
+                               i === 0 ? 'bg-yellow-200' : 
+                               i === 1 ? 'bg-amber-200' : 
+                               i === 2 ? 'bg-yellow-100' :
+                               i === 3 ? 'bg-amber-100' :
+                               'bg-yellow-300'
+                             } border border-yellow-300/30 shadow-sm`}
+                             style={{'--rotation': `${i % 2 ? '1deg' : '-1deg'}`} as React.CSSProperties}>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Floating elements for depth */}
+                  <div className="absolute -top-2 left-8 w-8 h-8 bg-blue-200 rounded-lg transform rotate-12 opacity-60 shadow-sm border border-blue-300/30"></div>
+                  <div className="absolute top-4 right-4 w-6 h-6 bg-purple-200 rounded-lg transform -rotate-6 opacity-70 shadow-sm border border-purple-300/30"></div>
+                  <div className="absolute bottom-2 left-1/3 w-10 h-10 bg-orange-200 rounded-lg transform rotate-6 opacity-50 shadow-sm border border-orange-300/30"></div>
+                </div>
+                
                 <div className="w-16 h-16 mx-auto mb-6 rounded-2xl gradient-button flex items-center justify-center">
                   <div className="w-8 h-8 bg-yellow-400 rounded-lg transform rotate-12"></div>
                 </div>
                 <p className="text-lg lg:text-xl mb-3 text-gray-900 font-jakarta font-medium">Ready to analyse your transcript</p>
                 <p className="text-sm lg:text-base text-gray-600">Add your sprint context and paste transcript content to get started</p>
+                <p className="text-xs text-gray-500 mt-4 font-jakarta">Your insights will be organized into visual categories like a real sprint wall</p>
               </div>
             </div>
           )}
