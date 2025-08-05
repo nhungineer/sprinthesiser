@@ -5,24 +5,24 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(240, 10%, 4%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 5%, 10%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 8%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 8%, 6%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 8%, 15%);
-  --input: hsl(240, 8%, 12%);
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(222.2, 84%, 4.9%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222.2, 84%, 4.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222.2, 84%, 4.9%);
+  --border: hsl(214.3, 31.8%, 91.4%);
+  --input: hsl(214.3, 31.8%, 91.4%);
   --primary: hsl(262, 83%, 58%);
   --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(240, 5%, 15%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 5%, 15%);
-  --accent-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222.2, 84%, 4.9%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(222.2, 84%, 4.9%);
   --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --destructive-foreground: hsl(210, 40%, 98%);
   --ring: hsl(262, 83%, 58%);
   --radius: 1rem;
   
@@ -67,7 +67,7 @@
   body {
     @apply font-sans antialiased text-foreground;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: linear-gradient(135deg, hsl(240, 10%, 4%) 0%, hsl(250, 15%, 8%) 50%, hsl(260, 20%, 6%) 100%);
+    background: linear-gradient(135deg, hsl(220, 30%, 97%) 0%, hsl(230, 25%, 95%) 50%, hsl(240, 20%, 98%) 100%);
     min-height: 100vh;
   }
 }
@@ -78,9 +78,10 @@
   }
   
   .gradient-card {
-    background: linear-gradient(135deg, hsl(240, 8%, 8%) 0%, hsl(245, 10%, 12%) 100%);
-    border: 1px solid hsl(240, 8%, 18%);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 255, 0.8) 100%);
+    border: 1px solid hsl(214.3, 31.8%, 91.4%);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
   }
   
   .gradient-button {
@@ -96,10 +97,10 @@
   }
   
   .insight-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 255, 0.9) 100%);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(214, 214, 214, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   }
   
   /* Theme colors */

@@ -621,10 +621,10 @@ export default function SprintPage() {
               <div className="w-7 h-7 sm:w-9 sm:h-9 bg-yellow-400 rounded-lg transform rotate-12"></div>
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-jakarta bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl font-bold font-jakarta bg-gradient-to-r from-gray-900 to-purple-600 bg-clip-text text-transparent">
                 Sprinthesiser
               </h1>
-              <p className="text-sm text-gray-400 mt-1">AI-powered Design Sprint synthesis</p>
+              <p className="text-sm text-gray-600 mt-1">AI-powered Design Sprint synthesis</p>
             </div>
           </div>
           
@@ -644,7 +644,7 @@ export default function SprintPage() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full sm:w-auto border-border/50 text-gray-300 hover:text-white rounded-xl font-medium"
+                className="w-full sm:w-auto border-border text-gray-700 hover:text-gray-900 rounded-xl font-medium"
                 onClick={() => setShowExportModal(true)}
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -669,27 +669,27 @@ export default function SprintPage() {
             )}
             
             <div className="gradient-card p-6 rounded-2xl">
-              <h3 className="font-semibold text-white mb-4 font-jakarta">Sprint Goals</h3>
+              <h3 className="font-semibold text-gray-900 mb-4 font-jakarta">Sprint Goals</h3>
               <Textarea
                 placeholder="What is your sprint trying to solve?"
                 value={sprintGoal}
                 onChange={(e) => setSprintGoal(e.target.value)}
-                className="mb-4 min-h-[100px] bg-background/50 border-border/50 text-white placeholder:text-gray-400 rounded-xl focus:ring-2 focus:ring-primary/50"
+                className="mb-4 min-h-[100px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
               />
               <div className="mt-4">
-                <Label className="text-sm font-medium text-gray-300 mb-3 block font-jakarta">Context</Label>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block font-jakarta">Context</Label>
                 <Textarea
                   placeholder="Add sprint hypotheses or context (use bullet points)..."
                   value={contextContent}
                   onChange={(e) => setContextContent(e.target.value)}
-                  className="min-h-[120px] bg-background/50 border-border/50 text-white placeholder:text-gray-400 rounded-xl focus:ring-2 focus:ring-primary/50"
+                  className="min-h-[120px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
 
             <div className="gradient-card p-6 rounded-2xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-white font-jakarta">Transcript</h3>
+                <h3 className="font-semibold text-gray-900 font-jakarta">Transcript</h3>
                 <div className="flex items-center gap-2">
                   <AIPromptSettings transcriptType={transcriptType} />
                   <Button variant="ghost" size="sm" className="p-1" onClick={() => document.getElementById('file-upload')?.click()}>
@@ -723,7 +723,7 @@ export default function SprintPage() {
                 placeholder="Paste your transcript here to extract insights"
                 value={transcriptContent}
                 onChange={(e) => setTranscriptContent(e.target.value)}
-                className="min-h-[250px] mb-6 bg-background/50 border-border/50 text-white placeholder:text-gray-400 rounded-xl focus:ring-2 focus:ring-primary/50"
+                className="min-h-[250px] mb-6 bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
               />
               <Button 
                 onClick={handleSynthesize}
@@ -744,8 +744,8 @@ export default function SprintPage() {
                 <div className="w-16 h-16 mx-auto mb-6 rounded-2xl gradient-button flex items-center justify-center">
                   <div className="w-8 h-8 bg-yellow-400 rounded-lg transform rotate-12"></div>
                 </div>
-                <p className="text-lg lg:text-xl mb-3 text-white font-jakarta font-medium">Ready to analyse your transcript</p>
-                <p className="text-sm lg:text-base text-gray-400">Add your sprint context and paste transcript content to get started</p>
+                <p className="text-lg lg:text-xl mb-3 text-gray-900 font-jakarta font-medium">Ready to analyse your transcript</p>
+                <p className="text-sm lg:text-base text-gray-600">Add your sprint context and paste transcript content to get started</p>
               </div>
             </div>
           )}
