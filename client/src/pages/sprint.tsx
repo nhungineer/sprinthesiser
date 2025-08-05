@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Upload, Plus, Vote, Download, X, CheckSquare } from "lucide-react";
+import { Upload, Plus, Vote, Download, X, CheckSquare, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Project, Theme, Quote, VotingSession as VotingSessionType } from "@shared/schema";
 import { TranscriptModal } from "@/components/TranscriptModal";
@@ -40,6 +40,8 @@ export default function SprintPage() {
   const [voteCounts, setVoteCounts] = useState<{ [key: string]: number }>({});
   const [userVotes, setUserVotes] = useState<{ [key: string]: boolean }>({});
   const [voterToken, setVoterToken] = useState<string>('');
+  const [showContext, setShowContext] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -364,8 +366,19 @@ export default function SprintPage() {
       <div className="flex-1 space-y-6">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl lg:text-2xl font-semibold text-gray-800">SPRINT INSIGHTS</h2>
+            <h2 className="text-xl lg:text-2xl font-semibold text-primary">SPRINT INSIGHTS</h2>
             <p className="text-sm lg:text-base text-gray-600">AI-powered synthesis assistant for Google Design Sprints.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="text-primary border-primary hover:bg-primary/5"
+            >
+              <Filter className="w-4 h-4 mr-1" />
+              Filter
+            </Button>
           </div>
         </div>
         
@@ -411,8 +424,10 @@ export default function SprintPage() {
           </Card>
         )}
 
-        {/* Filters */}
-        <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
+        {/* Filters - Show conditionally */}
+        {showFilters && (
+          <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
+        )}
         
         <div className={`grid grid-cols-1 ${gridCols} gap-6`} data-export-target="insights">
           {/* Opportunities */}
@@ -672,7 +687,7 @@ export default function SprintPage() {
             )}
             
             <div className="gradient-card p-6 rounded-2xl">
-              <h3 className="font-semibold text-gray-900 mb-4 font-jakarta">Sprint Goals</h3>
+              <h3 className="font-semibold text-primary mb-4 font-jakarta">Sprint Goals</h3>
               <Textarea
                 placeholder="What is your sprint trying to solve?"
                 value={sprintGoal}
@@ -680,19 +695,32 @@ export default function SprintPage() {
                 className="mb-4 min-h-[100px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
               />
               <div className="mt-4">
-                <Label className="text-sm font-medium text-gray-700 mb-3 block font-jakarta">Context</Label>
-                <Textarea
-                  placeholder="Add sprint hypotheses or context (use bullet points)..."
-                  value={contextContent}
-                  onChange={(e) => setContextContent(e.target.value)}
-                  className="min-h-[120px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
-                />
+                {!showContext ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowContext(true)}
+                    className="text-primary border-primary hover:bg-primary/5"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add context
+                  </Button>
+                ) : (
+                  <div>
+                    <Label className="text-sm font-medium text-primary mb-3 block font-jakarta">Context</Label>
+                    <Textarea
+                      placeholder="Add sprint hypotheses or context (use bullet points)..."
+                      value={contextContent}
+                      onChange={(e) => setContextContent(e.target.value)}
+                      className="min-h-[120px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="gradient-card p-6 rounded-2xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900 font-jakarta">Transcript</h3>
+                <h3 className="font-semibold text-primary font-jakarta">Transcript</h3>
                 <div className="flex items-center gap-2">
                   <AIPromptSettings transcriptType={transcriptType} />
                   <Button variant="ghost" size="sm" className="p-1" onClick={() => document.getElementById('file-upload')?.click()}>
