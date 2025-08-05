@@ -32,7 +32,7 @@ export function EnhancedThemeCard({
   userVotes = {},
   onVote
 }: EnhancedThemeCardProps) {
-  const [editingStep, setEditingStep] = useState<number | null>(null);
+  const [editingStep, setEditingStep] = useState<string | number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredStepIndex, setHoveredStepIndex] = useState<string | number | null>(null);
@@ -65,8 +65,13 @@ export function EnhancedThemeCard({
 
   const categoryConfig = getCategoryConfig();
 
-  const handleCopyStep = (step: string) => {
-    navigator.clipboard.writeText(step);
+  const handleCopyStep = async (step: string) => {
+    try {
+      await navigator.clipboard.writeText(step);
+      // Could add toast notification here if needed
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
   const handleEditStep = (index: number, isHmw: boolean = false) => {
@@ -78,7 +83,7 @@ export function EnhancedThemeCard({
     }
   };
 
-  const handleSaveEdit = (index: number) => {
+  const handleSaveEdit = (index: number, isHmw: boolean = false) => {
     if (onEditStep && editValue.trim()) {
       onEditStep(theme.id, index, editValue.trim());
     }
@@ -86,7 +91,7 @@ export function EnhancedThemeCard({
     setEditValue("");
   };
 
-  const handleDeleteStep = (index: number) => {
+  const handleDeleteStep = (index: number, isHmw: boolean = false) => {
     if (onDeleteStep) {
       onDeleteStep(theme.id, index);
     }
@@ -188,68 +193,111 @@ export function EnhancedThemeCard({
                   <div className="space-y-2">
                     {theme.hmwQuestions.map((hmw, idx) => (
                       <div key={`hmw-${idx}`} className="space-y-1">
-                        <div className="bg-white/50 p-2 rounded">
-                          <p className="text-sm text-gray-600 flex-1">
-                            {hmw}
-                          </p>
-                        </div>
-                        {!activeVotingSession?.isActive && (
-                          <div className="flex items-center justify-between bg-white/30 px-2 py-1 rounded text-xs">
-                            <div className="flex items-center space-x-2">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleCopyStep(hmw)}
-                                    className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
-                                  >
-                                    <Copy className="w-3 h-3" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Copy</TooltipContent>
-                              </Tooltip>
-                              
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleEditStep(idx, true)}
-                                    className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Edit</TooltipContent>
-                              </Tooltip>
-                              
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-5 w-5 p-0 opacity-70 hover:opacity-100 text-red-600"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete HMW Question</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete this "How Might We" question? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeleteStep(idx)}>Delete</AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                            <VoteButton itemType="hmw" itemIndex={idx} />
+                        {editingStep === `hmw-${idx}` ? (
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              className="flex-1 px-2 py-1 text-sm border rounded"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveEdit(idx, true);
+                                if (e.key === 'Escape') {
+                                  setEditingStep(null);
+                                  setEditValue("");
+                                }
+                              }}
+                              autoFocus
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleSaveEdit(idx, true)}
+                              className="h-6 w-6 p-0"
+                            >
+                              ✓
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingStep(null);
+                                setEditValue("");
+                              }}
+                              className="h-6 w-6 p-0"
+                            >
+                              ✕
+                            </Button>
                           </div>
+                        ) : (
+                          <>
+                            <div className="bg-white/50 p-2 rounded">
+                              <p className="text-sm text-gray-600 flex-1">
+                                {hmw}
+                              </p>
+                            </div>
+                            {!activeVotingSession?.isActive && (
+                              <div className="flex items-center justify-between bg-white/30 px-2 py-1 rounded text-xs">
+                                <div className="flex items-center space-x-2">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleCopyStep(hmw)}
+                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+                                      >
+                                        <Copy className="w-3 h-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Copy</TooltipContent>
+                                  </Tooltip>
+                                  
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setEditingStep(`hmw-${idx}`);
+                                          setEditValue(hmw);
+                                        }}
+                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100"
+                                      >
+                                        <Edit className="w-3 h-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Edit</TooltipContent>
+                                  </Tooltip>
+                                  
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-5 w-5 p-0 opacity-70 hover:opacity-100 text-red-600"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete HMW Question</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to delete this "How Might We" question? This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteStep(idx, true)}>Delete</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
+                                <VoteButton itemType="hmw" itemIndex={idx} />
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     ))}

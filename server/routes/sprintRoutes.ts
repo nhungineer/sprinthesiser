@@ -77,4 +77,89 @@ export function setupSprintRoutes(app: Express) {
       });
     }
   });
+
+  // Edit HMW question or AI step
+  app.patch("/api/themes/:themeId/items/:itemType/:itemIndex", async (req, res) => {
+    try {
+      const { themeId, itemType, itemIndex } = req.params;
+      const { newValue } = req.body;
+
+      if (!newValue || !newValue.trim()) {
+        return res.status(400).json({ message: "New value is required" });
+      }
+
+      const theme = await storage.getTheme(parseInt(themeId));
+      if (!theme) {
+        return res.status(404).json({ message: "Theme not found" });
+      }
+
+      const index = parseInt(itemIndex);
+      
+      if (itemType === 'hmw' && theme.hmwQuestions) {
+        if (index >= 0 && index < theme.hmwQuestions.length) {
+          theme.hmwQuestions[index] = newValue.trim();
+          await storage.updateTheme(theme.id, { hmwQuestions: theme.hmwQuestions });
+        } else {
+          return res.status(400).json({ message: "Invalid HMW question index" });
+        }
+      } else if (itemType === 'step' && theme.aiSuggestedSteps) {
+        if (index >= 0 && index < theme.aiSuggestedSteps.length) {
+          theme.aiSuggestedSteps[index] = newValue.trim();
+          await storage.updateTheme(theme.id, { aiSuggestedSteps: theme.aiSuggestedSteps });
+        } else {
+          return res.status(400).json({ message: "Invalid AI step index" });
+        }
+      } else {
+        return res.status(400).json({ message: "Invalid item type" });
+      }
+
+      res.json({ message: "Item updated successfully" });
+    } catch (error) {
+      console.error("Item edit error:", error);
+      res.status(500).json({ 
+        message: "Failed to edit item", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Delete HMW question or AI step
+  app.delete("/api/themes/:themeId/items/:itemType/:itemIndex", async (req, res) => {
+    try {
+      const { themeId, itemType, itemIndex } = req.params;
+
+      const theme = await storage.getTheme(parseInt(themeId));
+      if (!theme) {
+        return res.status(404).json({ message: "Theme not found" });
+      }
+
+      const index = parseInt(itemIndex);
+      
+      if (itemType === 'hmw' && theme.hmwQuestions) {
+        if (index >= 0 && index < theme.hmwQuestions.length) {
+          theme.hmwQuestions.splice(index, 1);
+          await storage.updateTheme(theme.id, { hmwQuestions: theme.hmwQuestions });
+        } else {
+          return res.status(400).json({ message: "Invalid HMW question index" });
+        }
+      } else if (itemType === 'step' && theme.aiSuggestedSteps) {
+        if (index >= 0 && index < theme.aiSuggestedSteps.length) {
+          theme.aiSuggestedSteps.splice(index, 1);
+          await storage.updateTheme(theme.id, { aiSuggestedSteps: theme.aiSuggestedSteps });
+        } else {
+          return res.status(400).json({ message: "Invalid AI step index" });
+        }
+      } else {
+        return res.status(400).json({ message: "Invalid item type" });
+      }
+
+      res.json({ message: "Item deleted successfully" });
+    } catch (error) {
+      console.error("Item delete error:", error);
+      res.status(500).json({ 
+        message: "Failed to delete item", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
 }

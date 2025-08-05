@@ -32,6 +32,7 @@ export interface IStorage {
   
   // Themes
   createTheme(theme: InsertTheme): Promise<Theme>;
+  getTheme(id: number): Promise<Theme | undefined>;
   getThemesByProject(projectId: number): Promise<Theme[]>;
   updateTheme(id: number, updates: UpdateThemeType): Promise<Theme | undefined>;
   deleteTheme(id: number): Promise<void>;
@@ -151,6 +152,10 @@ export class MemStorage implements IStorage {
     };
     this.themes.set(id, theme);
     return theme;
+  }
+
+  async getTheme(id: number): Promise<Theme | undefined> {
+    return this.themes.get(id);
   }
 
   async getThemesByProject(projectId: number): Promise<Theme[]> {

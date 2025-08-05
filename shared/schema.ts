@@ -167,6 +167,8 @@ export const updateThemeSchema = z.object({
     transcriptId: z.number(),
   })).optional(),
   position: z.number().optional(),
+  hmwQuestions: z.array(z.string()).optional(),
+  aiSuggestedSteps: z.array(z.string()).optional(),
 });
 
 // Inferred types

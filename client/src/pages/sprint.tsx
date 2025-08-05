@@ -11,7 +11,7 @@ import { Upload, Plus, Vote, Download, X, CheckSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Project, Theme, Quote, VotingSession as VotingSessionType } from "@shared/schema";
 import { TranscriptModal } from "@/components/TranscriptModal";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { EnhancedThemeCard } from "@/components/EnhancedThemeCard";
 import { SprintStatistics } from "@/components/SprintStatistics";
 import { SprintFilters, FilterState } from "@/components/SprintFilters";
@@ -386,11 +386,26 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
-                  onEditStep={(themeId, stepIndex, newValue) => {
-                    console.log('Edit step:', themeId, stepIndex, newValue);
+                  onEditStep={async (themeId, stepIndex, newValue) => {
+                    try {
+                      await apiRequest(`/api/themes/${themeId}/items/hmw/${stepIndex}`, {
+                        method: 'PATCH',
+                        body: { newValue }
+                      });
+                      queryClient.invalidateQueries({ queryKey: ['/api/themes'] });
+                    } catch (error) {
+                      console.error('Failed to edit HMW question:', error);
+                    }
                   }}
-                  onDeleteStep={(themeId, stepIndex) => {
-                    console.log('Delete step:', themeId, stepIndex);
+                  onDeleteStep={async (themeId, stepIndex) => {
+                    try {
+                      await apiRequest(`/api/themes/${themeId}/items/hmw/${stepIndex}`, {
+                        method: 'DELETE'
+                      });
+                      queryClient.invalidateQueries({ queryKey: ['/api/themes'] });
+                    } catch (error) {
+                      console.error('Failed to delete HMW question:', error);
+                    }
                   }}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
@@ -420,11 +435,26 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
-                  onEditStep={(themeId, stepIndex, newValue) => {
-                    console.log('Edit step:', themeId, stepIndex, newValue);
+                  onEditStep={async (themeId, stepIndex, newValue) => {
+                    try {
+                      await apiRequest(`/api/themes/${themeId}/items/hmw/${stepIndex}`, {
+                        method: 'PATCH',
+                        body: { newValue }
+                      });
+                      queryClient.invalidateQueries({ queryKey: ['/api/themes'] });
+                    } catch (error) {
+                      console.error('Failed to edit HMW question:', error);
+                    }
                   }}
-                  onDeleteStep={(themeId, stepIndex) => {
-                    console.log('Delete step:', themeId, stepIndex);
+                  onDeleteStep={async (themeId, stepIndex) => {
+                    try {
+                      await apiRequest(`/api/themes/${themeId}/items/hmw/${stepIndex}`, {
+                        method: 'DELETE'
+                      });
+                      queryClient.invalidateQueries({ queryKey: ['/api/themes'] });
+                    } catch (error) {
+                      console.error('Failed to delete HMW question:', error);
+                    }
                   }}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
@@ -455,11 +485,26 @@ export default function SprintPage() {
                     key={theme.id}
                     theme={theme}
                     transcriptType={transcriptType}
-                    onEditStep={(themeId, stepIndex, newValue) => {
-                      console.log('Edit step:', themeId, stepIndex, newValue);
+                    onEditStep={async (themeId, stepIndex, newValue) => {
+                      try {
+                        await apiRequest(`/api/themes/${themeId}/items/hmw/${stepIndex}`, {
+                          method: 'PATCH',
+                          body: { newValue }
+                        });
+                        queryClient.invalidateQueries({ queryKey: ['/api/themes'] });
+                      } catch (error) {
+                        console.error('Failed to edit HMW question:', error);
+                      }
                     }}
-                    onDeleteStep={(themeId, stepIndex) => {
-                      console.log('Delete step:', themeId, stepIndex);
+                    onDeleteStep={async (themeId, stepIndex) => {
+                      try {
+                        await apiRequest(`/api/themes/${themeId}/items/hmw/${stepIndex}`, {
+                          method: 'DELETE'
+                        });
+                        queryClient.invalidateQueries({ queryKey: ['/api/themes'] });
+                      } catch (error) {
+                        console.error('Failed to delete HMW question:', error);
+                      }
                     }}
                     onViewTranscript={handleViewTranscript}
                     transcriptContent={transcriptContent}
