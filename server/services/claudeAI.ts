@@ -104,7 +104,8 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
     {
       "title": "Specific user behavior or feedback",
       "description": "What users actually did/said and what it means for the solution", 
-      "category": "opportunities|pain_points",
+      "category": "opportunities|pain_points|ideas_hmws",
+      "hmwQuestions": ["How might we build on what worked?", "How might we fix what didn't work?"],
       "aiSuggestedSteps": ["Iterate the design based on this feedback", "Test this specific element further"],
       "quotes": [{"text": "exact user quote or behavior observation", "source": "User #/Session #", "transcriptId": 1}]
     }

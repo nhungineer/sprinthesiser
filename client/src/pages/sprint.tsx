@@ -770,11 +770,10 @@ export default function SprintPage() {
           {currentStep === 'insights' ? (
             renderInsightCategories()
           ) : (
-            <div className="flex-1 flex flex-col p-6">
-              <div className="text-center gradient-card p-8 rounded-3xl w-full mb-8">
+            <div className="flex-1 flex flex-col">
+              <div className="text-center mb-6">
                 <p className="text-lg lg:text-xl mb-3 text-gray-900 font-jakarta font-medium">Ready to analyse your transcript</p>
                 <p className="text-sm lg:text-base text-gray-600">Add your sprint context and paste transcript content to get started</p>
-                <p className="text-xs text-gray-500 mt-4 font-jakarta">Your insights will be organised into visual categories like a real sprint wall</p>
               </div>
               
               <div className="flex-1 gradient-card p-8 rounded-3xl relative overflow-hidden">
@@ -784,7 +783,7 @@ export default function SprintPage() {
                     {/* Opportunities Column */}
                     <div className="col-span-3 space-y-3 h-full">
                       <div className="h-8 bg-green-600 rounded-xl mb-4 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Comic Neue, cursive'}}>Opportunities</span>
+                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Permanent Marker, cursive'}}>OPPORTUNITIES</span>
                       </div>
                       {Array.from({length: 7}, (_, i) => (
                         <div key={`opp-${i}`} 
@@ -805,7 +804,7 @@ export default function SprintPage() {
                     {/* Pain Points Column */}
                     <div className="col-span-2 space-y-3 h-full">
                       <div className="h-8 bg-red-600 rounded-xl mb-4 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Comic Neue, cursive'}}>Pain Points</span>
+                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Permanent Marker, cursive'}}>PAIN POINTS</span>
                       </div>
                       {Array.from({length: 5}, (_, i) => (
                         <div key={`pain-${i}`} 
@@ -824,7 +823,7 @@ export default function SprintPage() {
                     {/* Ideas/HMWs Column */}
                     <div className="col-span-3 space-y-3 h-full">
                       <div className="h-8 bg-yellow-600 rounded-xl mb-4 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Comic Neue, cursive'}}>Ideas/HMWs</span>
+                        <span className="text-white font-bold text-lg" style={{fontFamily: 'Permanent Marker, cursive'}}>IDEAS/HMWS</span>
                       </div>
                       {Array.from({length: 6}, (_, i) => (
                         <div key={`idea-${i}`} 
