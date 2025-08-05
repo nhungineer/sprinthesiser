@@ -68,9 +68,25 @@ export function EnhancedThemeCard({
   const handleCopyStep = async (step: string) => {
     try {
       await navigator.clipboard.writeText(step);
-      // Could add toast notification here if needed
+      // Show temporary feedback
+      const originalText = step.substring(0, 20) + '...';
+      // Create a temporary toast-like element
+      const toastEl = document.createElement('div');
+      toastEl.textContent = 'Copied to clipboard!';
+      toastEl.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity';
+      document.body.appendChild(toastEl);
+      setTimeout(() => {
+        toastEl.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(toastEl), 300);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+      // Show error feedback
+      const toastEl = document.createElement('div');
+      toastEl.textContent = 'Failed to copy';
+      toastEl.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50';
+      document.body.appendChild(toastEl);
+      setTimeout(() => document.body.removeChild(toastEl), 2000);
     }
   };
 
@@ -194,40 +210,46 @@ export function EnhancedThemeCard({
                     {theme.hmwQuestions.map((hmw, idx) => (
                       <div key={`hmw-${idx}`} className="space-y-1">
                         {editingStep === `hmw-${idx}` ? (
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="text"
+                          <div className="space-y-2">
+                            <textarea
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              className="flex-1 px-2 py-1 text-sm border rounded"
+                              className="w-full px-3 py-2 text-sm border rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              rows={3}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveEdit(idx, true);
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleSaveEdit(idx, true);
+                                }
                                 if (e.key === 'Escape') {
                                   setEditingStep(null);
                                   setEditValue("");
                                 }
                               }}
+                              placeholder="Enter your HMW question..."
                               autoFocus
                             />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleSaveEdit(idx, true)}
-                              className="h-6 w-6 p-0"
-                            >
-                              ✓
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setEditingStep(null);
-                                setEditValue("");
-                              }}
-                              className="h-6 w-6 p-0"
-                            >
-                              ✕
-                            </Button>
+                            <div className="flex items-center justify-end space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingStep(null);
+                                  setEditValue("");
+                                }}
+                                className="h-7 px-3 py-1 text-xs"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleSaveEdit(idx, true)}
+                                className="h-7 px-3 py-1 text-xs"
+                              >
+                                Save
+                              </Button>
+                            </div>
                           </div>
                         ) : (
                           <>

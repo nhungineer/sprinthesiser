@@ -174,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transcripts = await storage.getTranscriptsByProject(DEFAULT_PROJECT_ID);
       res.json(transcripts);
     } catch (error) {
-      res.status(500).json({ message: "Failed to get transcripts", error: error.message });
+      res.status(500).json({ message: "Failed to get transcripts", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -185,7 +185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteTranscript(id);
       res.json({ message: "Transcript deleted successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete transcript", error: error.message });
+      res.status(500).json({ message: "Failed to delete transcript", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
