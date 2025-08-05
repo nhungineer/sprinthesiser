@@ -68,12 +68,12 @@ export default function SprintPage() {
     setActiveVotingSession(activeSession || null);
   }, [activeSession]);
 
-  // Fetch vote counts when there's an active session
+  // Fetch vote counts when there's an active session or when session just ended
   React.useEffect(() => {
     if (activeSession?.id) {
       fetchVoteCounts(activeSession.id);
     }
-  }, [activeSession?.id, themes]);
+  }, [activeSession?.id, activeSession?.isActive, themes]);
 
   const fetchVoteCounts = async (sessionId: number) => {
     try {
@@ -384,7 +384,7 @@ export default function SprintPage() {
         )}
 
         {/* Show results if session just ended and we have vote counts */}
-        {!activeSession?.isActive && Object.keys(voteCounts).length > 0 && (
+        {(activeSession && !activeSession.isActive && Object.keys(voteCounts).length > 0) && (
           <Card className="mb-6 bg-green-50 border-green-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -398,7 +398,10 @@ export default function SprintPage() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setVoteCounts({})}
+                  onClick={() => {
+                    setVoteCounts({});
+                    setUserVotes({});
+                  }}
                   className="text-green-600 border-green-300"
                 >
                   Clear Results

@@ -261,12 +261,8 @@ export class MemStorage implements IStorage {
       session.endsAt = new Date();
       this.votingSessions.set(id, session);
       
-      // Clear all votes for this session
-      const votesToDelete = Array.from(this.votes.entries())
-        .filter(([_, vote]) => vote.sessionId === id)
-        .map(([voteId]) => voteId);
-      
-      votesToDelete.forEach(voteId => this.votes.delete(voteId));
+      // Keep votes for final results display - don't clear them
+      // The votes remain accessible for displaying final results after session ends
     }
   }
 

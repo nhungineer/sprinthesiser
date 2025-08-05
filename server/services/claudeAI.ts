@@ -44,13 +44,14 @@ Extract insights and organise them into three categories:
 2. PAIN POINTS - Problems, barriers, challenges experts identified 
 3. MISC/OBSERVATIONS - Other observations, behaviours, patterns or ideas that don't fit into the above categories
 
-Reference the sprint goal and questions to focus on relevant insights.
+Reference the sprint goal and context to focus on relevant insights.
 
 For each insight:
 - Create a clear, actionable title that summarise the key idea (3-6 words)
 - Provide a description explaining the insight's significance (10-25 words)
 - Generate 2-3 "How Might We" questions focused on framing the problems to solve, or leverage opportunities rather than proposing specic solutions
-- Include verbatim quotes that support this insight, do not make things up`,
+- Include verbatim quotes that support this insight, do not make things up
+- Write in Australian English spelling, NOT American spelling`,
       userPromptTemplate: `Analyse these expert interview transcripts for Sprint insights.
 
 Sprint Goal: {{sprintGoal}}
@@ -76,18 +77,20 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
 
     testing_notes: {
       name: "User Testing Analysis",
-      systemPrompt: `You are an expert Design Sprint facilitator analyzing Day 4 user testing notes. Your role is to extract learning insights that will guide the Sprint team's next iteration decisions and answer the sprint goals and questions.
+      systemPrompt: `You are an expert Design Sprint facilitator analysing Day 4 user testing notes. Your role is to extract learning insights that will guide the Sprint team's next iteration decisions and answer the sprint goals and questions.
 
-Extract insights and organize them into three categories:
+Extract insights and organise them into two categories:
 1. WHAT WORKED - Features, interactions, or concepts that users responded well to
-2. WHAT DIDN'T WORK - Usability issues, confusions, or failures users experienced
-3. IDEAS/NEXT STEPS - Improvements, iterations, or new directions based on user feedback, based on the sprint goal and questions
+2. WHAT DIDN'T WORK - Usability issues, confusions, invalidated hypotheses or product values, or failures users experienced
+
 
 For each insight:
-- Create a clear, specific title focused on user behavior or feedback
+- Create a clear, specific title focused on user behaviour or feedback (10-15 words)
 - Describe what users actually did or said, not assumptions
-- Generate practical next steps for iteration or future discovery questions 'What do we need to find out next'
-- Include direct user quotes that demonstrate the finding`,
+- Focus only on insights/patterns that appear at least twice in the transcript
+- Generate practical next steps for iteration or future discovery questions 'What do we need to find out next' or what to discontinued because the hypothesis was disproven
+- Include direct user quotes that demonstrate the finding
+- Write in Australian English spelling, NOT American spelling`,
       userPromptTemplate: `Analyze these user testing notes for actionable insights.
 
 Sprint Goal: {{sprintGoal}}
@@ -101,8 +104,7 @@ CRITICAL: Return ONLY valid JSON with no additional text. Use this exact structu
     {
       "title": "Specific user behavior or feedback",
       "description": "What users actually did/said and what it means for the solution", 
-      "category": "opportunities|pain_points|ideas_hmws",
-      "hmwQuestions": ["How might we build on what worked?", "How might we fix what didn't work?"],
+      "category": "opportunities|pain_points",
       "aiSuggestedSteps": ["Iterate the design based on this feedback", "Test this specific element further"],
       "quotes": [{"text": "exact user quote or behavior observation", "source": "User #/Session #", "transcriptId": 1}]
     }
