@@ -637,17 +637,7 @@ export default function SprintPage() {
             </div>
           </div>
           
-          {(currentStep === 'context' || currentStep === 'transcript') && (
-            <Button
-              onClick={loadDemoData}
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2 whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Load Demo Data</span>
-            </Button>
-          )}
+
           
           {currentStep === 'insights' && (
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
@@ -677,6 +667,18 @@ export default function SprintPage() {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Left Panel - Sprint Context */}
           <div className="w-full lg:w-80 space-y-6">
+            {(currentStep === 'context' || currentStep === 'transcript') && (
+              <Button
+                onClick={loadDemoData}
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-2 w-full"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Load Demo Data</span>
+              </Button>
+            )}
+            
             <div>
               <h3 className="font-semibold text-gray-800 mb-3">Sprint goals</h3>
               <Textarea
@@ -685,33 +687,54 @@ export default function SprintPage() {
                 onChange={(e) => setSprintGoal(e.target.value)}
                 className="mb-3 min-h-[100px]"
               />
-              <Button variant="outline" size="sm" onClick={addContextField}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add context
-              </Button>
-              
-              {/* Dynamic context fields */}
-              {contextFields.map((field, index) => (
-                <div key={index} className="mt-3">
+              {contextFields.length > 0 && (
+                <div className="mt-4">
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium text-gray-700">Context</Label>
                     <Button 
-                      variant="ghost" 
+                      variant="outline" 
                       size="sm" 
-                      onClick={() => removeContextField(index)}
-                      className="h-6 w-6 p-0"
+                      onClick={addContextField}
+                      className="h-7 px-2 text-xs"
                     >
-                      <X className="w-4 h-4" />
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add
                     </Button>
                   </div>
-                  <Textarea
-                    placeholder="Add additional context..."
-                    value={field}
-                    onChange={(e) => updateContextField(index, e.target.value)}
-                    className="min-h-[80px]"
-                  />
+                  <div className="border rounded-md p-3 max-h-40 overflow-y-auto bg-gray-50">
+                    <ul className="space-y-2">
+                      {contextFields.map((field, index) => (
+                        <li key={index} className="flex items-start space-x-2">
+                          <span className="text-gray-600 mt-1 text-sm">•</span>
+                          <div className="flex-1 group">
+                            <Textarea
+                              value={field}
+                              onChange={(e) => updateContextField(index, e.target.value)}
+                              className="min-h-[60px] text-sm bg-white border-gray-200 resize-none"
+                              placeholder="Sprint hypothesis or context..."
+                            />
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => removeContextField(index)}
+                              className="h-5 w-5 p-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-3 h-3 text-gray-400" />
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              ))}
+              )}
+              
+              {contextFields.length === 0 && (
+                <Button variant="outline" size="sm" onClick={addContextField}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add context
+                </Button>
+              )}
             </div>
 
             <div>
@@ -750,7 +773,7 @@ export default function SprintPage() {
                 placeholder="Paste your transcript here to extract insights"
                 value={transcriptContent}
                 onChange={(e) => setTranscriptContent(e.target.value)}
-                className="min-h-[300px] mb-4"
+                className="min-h-[250px] mb-4"
               />
               <Button 
                 onClick={handleSynthesize}
