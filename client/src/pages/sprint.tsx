@@ -311,6 +311,17 @@ export default function SprintPage() {
     const ideasHmws = filteredThemes.filter(t => t.category === 'miscellaneous');
     const generic = filteredThemes.filter(t => t.category === 'generic');
 
+    // Calculate grid columns based on which categories have content
+    const hasOpportunities = opportunities.length > 0;
+    const hasPainPoints = painPoints.length > 0;
+    const hasIdeasHmws = ideasHmws.length > 0;
+    const hasGeneric = generic.length > 0;
+
+    const activeColumns = [hasOpportunities, hasPainPoints, hasIdeasHmws, hasGeneric].filter(Boolean).length;
+    const gridCols = activeColumns === 1 ? 'lg:grid-cols-1' : 
+                     activeColumns === 2 ? 'lg:grid-cols-2' : 
+                     'lg:grid-cols-3';
+
     return (
       <div className="flex-1 space-y-6">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -362,7 +373,7 @@ export default function SprintPage() {
         {/* Filters */}
         <SprintFilters onFilterChange={handleFilterChange} transcriptType={transcriptType} />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" data-export-target="insights">
+        <div className={`grid grid-cols-1 ${gridCols} gap-6`} data-export-target="insights">
           {/* Opportunities */}
           <div className="space-y-4">
             <div className="bg-green-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
@@ -375,6 +386,12 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
+                  onEditStep={(themeId, stepIndex, newValue) => {
+                    console.log('Edit step:', themeId, stepIndex, newValue);
+                  }}
+                  onDeleteStep={(themeId, stepIndex) => {
+                    console.log('Delete step:', themeId, stepIndex);
+                  }}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
                   activeVotingSession={activeVotingSession}
@@ -403,6 +420,12 @@ export default function SprintPage() {
                   key={theme.id}
                   theme={theme}
                   transcriptType={transcriptType}
+                  onEditStep={(themeId, stepIndex, newValue) => {
+                    console.log('Edit step:', themeId, stepIndex, newValue);
+                  }}
+                  onDeleteStep={(themeId, stepIndex) => {
+                    console.log('Delete step:', themeId, stepIndex);
+                  }}
                   onViewTranscript={handleViewTranscript}
                   transcriptContent={transcriptContent}
                   activeVotingSession={activeVotingSession}
@@ -419,33 +442,36 @@ export default function SprintPage() {
             </div>
           </div>
 
-          {/* Ideas/HMWs */}
-          <div className="space-y-4">
-            <div className="bg-yellow-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
-              <span>{transcriptType === 'expert_interviews' ? 'MISC/OBSERVATIONS' : 'IDEAS/NEXT STEPS'}</span>
-              <span className="bg-yellow-700 px-2 py-1 rounded text-xs">{ideasHmws.length}</span>
+          {/* Ideas/HMWs - Only show if has content */}
+          {hasIdeasHmws && (
+            <div className="space-y-4">
+              <div className="bg-yellow-600 text-white px-4 py-2 text-sm font-medium rounded flex items-center justify-between">
+                <span>{transcriptType === 'expert_interviews' ? 'MISC/OBSERVATIONS' : 'IDEAS/NEXT STEPS'}</span>
+                <span className="bg-yellow-700 px-2 py-1 rounded text-xs">{ideasHmws.length}</span>
+              </div>
+              <div className="space-y-3">
+                {ideasHmws.map((theme) => (
+                  <EnhancedThemeCard
+                    key={theme.id}
+                    theme={theme}
+                    transcriptType={transcriptType}
+                    onEditStep={(themeId, stepIndex, newValue) => {
+                      console.log('Edit step:', themeId, stepIndex, newValue);
+                    }}
+                    onDeleteStep={(themeId, stepIndex) => {
+                      console.log('Delete step:', themeId, stepIndex);
+                    }}
+                    onViewTranscript={handleViewTranscript}
+                    transcriptContent={transcriptContent}
+                    activeVotingSession={activeVotingSession}
+                    voteCounts={voteCounts}
+                    userVotes={userVotes}
+                    onVote={handleVote}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="space-y-3">
-              {ideasHmws.map((theme) => (
-                <EnhancedThemeCard
-                  key={theme.id}
-                  theme={theme}
-                  transcriptType={transcriptType}
-                  onViewTranscript={handleViewTranscript}
-                  transcriptContent={transcriptContent}
-                  activeVotingSession={activeVotingSession}
-                  voteCounts={voteCounts}
-                  userVotes={userVotes}
-                  onVote={handleVote}
-                />
-              ))}
-              {ideasHmws.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="text-sm">No misc/observations found</p>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
 
           {/* Generic */}
           {generic.length > 0 && (
