@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { FileParserService } from "./services/fileParser";
 import { ClaudeSprintAI } from "./services/claudeAI";
 import { ExportService } from "./services/exportService";
-import { SprintAIService } from "./services/sprintAI";
+
 import { setupSprintRoutes } from "./routes/sprintRoutes";
 import { 
   fileUploadSchema, 
@@ -104,8 +104,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Content is required" });
       }
 
-      // Extract Sprint insights using specialized AI service
-      const sprintThemes = await SprintAIService.extractSprintInsights(content, sprintGoal);
+      // Extract Sprint insights using Claude AI service
+      const sprintThemes = await ClaudeSprintAI.extractSprintInsights(content, 'expert_interviews', sprintGoal);
       
       // Store themes in database
       const storedThemes = [];
