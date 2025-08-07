@@ -177,6 +177,7 @@ Return JSON with this exact structure:
 
       const response = await anthropic.messages.create({
         max_tokens: 4000,
+        temperature: 0,
         messages: [
           {
             role: "user",
