@@ -22,10 +22,9 @@ import { AIPromptSettings } from "@/components/AIPromptSettings";
 
 export default function SprintPage() {
   const [sprintGoal, setSprintGoal] = useState("");
-  const [contextContent, setContextContent] = useState<string>("");
   const [transcriptContent, setTranscriptContent] = useState("");
   const [transcriptType, setTranscriptType] = useState<'expert_interviews' | 'testing_notes'>('expert_interviews');
-  const [currentStep, setCurrentStep] = useState<'context' | 'transcript' | 'insights'>('context');
+  const [currentStep, setCurrentStep] = useState<'transcript' | 'insights'>('transcript');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     searchTerm: '',
@@ -40,7 +39,6 @@ export default function SprintPage() {
   const [voteCounts, setVoteCounts] = useState<{ [key: string]: number }>({});
   const [userVotes, setUserVotes] = useState<{ [key: string]: boolean }>({});
   const [voterToken, setVoterToken] = useState<string>('');
-  const [showContext, setShowContext] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const { toast } = useToast();
 
@@ -189,9 +187,7 @@ export default function SprintPage() {
     },
   });
 
-  const handleContextSubmit = () => {
-    setCurrentStep('transcript');
-  };
+  
 
 
 
@@ -675,7 +671,7 @@ export default function SprintPage() {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Left Panel - Sprint Context */}
           <div className="w-full lg:w-80 space-y-6">
-            {(currentStep === 'context' || currentStep === 'transcript') && (
+            {currentStep === 'transcript' && (
               <Button
                 onClick={loadDemoData}
                 size="sm"
@@ -694,28 +690,7 @@ export default function SprintPage() {
                 onChange={(e) => setSprintGoal(e.target.value)}
                 className="mb-4 min-h-[100px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
               />
-              <div className="mt-4">
-                {!showContext ? (
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowContext(true)}
-                    className="text-primary border-primary hover:bg-primary/5"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add context
-                  </Button>
-                ) : (
-                  <div>
-                    <Label className="text-sm font-medium text-primary mb-3 block font-jakarta">Context</Label>
-                    <Textarea
-                      placeholder="Add sprint hypotheses or context (use bullet points)..."
-                      value={contextContent}
-                      onChange={(e) => setContextContent(e.target.value)}
-                      className="min-h-[120px] bg-white/60 border-border text-gray-900 placeholder:text-gray-500 rounded-xl focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-                )}
-              </div>
+              
             </div>
 
             <div className="gradient-card p-6 rounded-2xl">
