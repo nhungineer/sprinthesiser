@@ -169,19 +169,20 @@ Return JSON with this exact structure:
         this.PROMPT_TEMPLATES[template] ||
         this.PROMPT_TEMPLATES.general_research;
 
-      // Build the user prompt by replacing template variables
-      const userPrompt = promptConfig.userPromptTemplate
-        .replace("{{sprintGoal}}", sprintGoal || "Not specified")
-        .replace("{{transcriptContent}}", transcriptContent)
-        .replace("{{transcriptType}}", transcriptType);
+      // Build the user prompt by replacing template variables consistently
+      let userPrompt = promptConfig.userPromptTemplate;
+      userPrompt = userPrompt.replace(/\{\{sprintGoal\}\}/g, sprintGoal || "Not specified");
+      userPrompt = userPrompt.replace(/\{\{transcriptContent\}\}/g, transcriptContent);
+      userPrompt = userPrompt.replace(/\{\{transcriptType\}\}/g, transcriptType);
 
       const response = await anthropic.messages.create({
         max_tokens: 4000,
         temperature: 0,
+        system: promptConfig.systemPrompt,
         messages: [
           {
             role: "user",
-            content: `${promptConfig.systemPrompt}\n\n${userPrompt}`,
+            content: userPrompt,
           },
         ],
         // Using Claude Haiku for cost-effective analysis
