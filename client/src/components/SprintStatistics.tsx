@@ -49,7 +49,7 @@ export function SprintStatistics({ themes, processingTime = 0 }: SprintStatistic
         
         <div className="flex items-center gap-2 text-gray-600">
           <Clock className="w-4 h-4" />
-          <span className="text-sm">{formatTime(processingTime)}</span>
+          <span className="text-sm">{formatTime(processingTime)} taken</span>
         </div>
       </div>
     </Card>
